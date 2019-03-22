@@ -12,7 +12,8 @@ void loadLog();
 void saveLog();
 void helpMsg(char*);
 int commandFormatIsCorrect(char*);
-
+char* strlwr(char*);
+void removeArticles(char*);
 
 
 int main(void){
@@ -122,10 +123,6 @@ void loadDatabase(node* tree){
   FILE * db;
   char line[200];
   db = fopen("movie_records.txt", "r");
-  //head = getNewTrieNode();
-  int i;
-  int tabNum = 0;
-
 
   while (fgets(line, sizeof(line), db) != NULL) {
     //struct entry movieEntry;
@@ -146,6 +143,8 @@ void loadDatabase(node* tree){
 	  strcpy(movieEntry.titleOrig, data);
 	  break;
 	case 3:
+	  memcpy(data, strlwr(data), sizeof(strlwr(data)));
+	  removeArticles(data);
 	  strcpy(movieEntry.title, data);
 	  break;
 	case 4:
@@ -177,12 +176,38 @@ void loadDatabase(node* tree){
   char search[150];
   printf("Search: \n");
   scanf("%[^\n]s", search);
+  memcpy(search, strlwr(search), sizeof(strlwr(search)));
+  removeArticles(search);
+  printf("%s\n", search);
   struct entry movieSearch = find(search, tree);
-  printf("The genre(s) of %s is(are): %s\n", search, movieSearch.genres);
-
-
+  printf("The genre(s) of %s is(are): %s\n", search, movieSearch.titleOrig);
+  
   fclose(db);
   return;
 }
 
+char *strlwr(char *string){
+  char *newString = (char*)malloc(strlen(string));
+  int i;
+  for(i = 0; i < strlen(string); i++){
+    if(string[i] >= 'A' && string[i] <= 'Z' && string[i] != '\0'){
+      newString[i] = string[i] + 32;
+    } else {
+      newString[i] = string[i];
+    }
+  }
+  return newString;
+}
 
+void removeArticles (char *string) {
+  char *match;
+  char *articles[] = {"the ", "a ", "an ", ", ", ": ", "; ", ". "};
+  int i;
+  for (i = 0; i < 7; i++){
+    int len = strlen(articles[i]);
+    while ((match = strstr(string, articles[i]))) {
+      *match = '\0';
+      strcat(string, match+len);
+    }
+  }
+}

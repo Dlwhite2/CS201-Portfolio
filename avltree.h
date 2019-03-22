@@ -20,6 +20,7 @@ typedef struct entry{
 typedef struct node
 {
   char title[150];
+  char titleOrig[150];
   char releaseDate[15];
   char genres[50];
   char runtimeMinutes[10];
@@ -67,6 +68,7 @@ struct entry find(char* query, node* t )
     return find( query, t->right );
   else{
     strcpy(movie.title, t->title);
+    strcpy(movie.titleOrig, t->titleOrig);
     strcpy(movie.releaseDate, t->releaseDate);
     strcpy(movie.runtimeMinutes, t->runtimeMinutes);
     strcpy(movie.genres, t->genres);
@@ -211,6 +213,7 @@ node* insert(struct entry movie/*int e*/, node* t)
 	{
 	  //t->title = e;
 	  strcpy(t->title, movie.title);
+	  strcpy(t->titleOrig, movie.titleOrig);
 	  strcpy(t->releaseDate, movie.releaseDate);
 	  strcpy(t->runtimeMinutes, movie.runtimeMinutes);
 	  strcpy(t->genres, movie.genres);
@@ -221,20 +224,22 @@ node* insert(struct entry movie/*int e*/, node* t)
   else if( strcmp(movie.title, t->title)<0)//e < t->data )
     {
       t->left = insert(movie, t->left );
-      if( height( t->left ) - height( t->right ) == 2 )
+      if(height(t->left)-height(t->right) == 2){
 	if( strcmp(movie.title, t->left->title) < 0)//e < t->left->data )
 	  t = single_rotate_with_left( t );
 	else
 	  t = double_rotate_with_left( t );
+      }
     }
   else if( strcmp(movie.title, t->title) > 0)//e > t->data )
     {
       t->right = insert(movie, t->right );
-      if( height( t->right ) - height( t->left ) == 2 )
+      if(height(t->right)-height(t->left) == 2){
 	if( strcmp(movie.title, t->right->title) > 0)//e > t->right->data )
 	  t = single_rotate_with_right( t );
 	else
 	  t = double_rotate_with_right( t );
+      }
     }
   /* Else X is in the tree already; we'll do nothing */
 
