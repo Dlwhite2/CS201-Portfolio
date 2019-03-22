@@ -32,13 +32,9 @@ typedef struct node
 
 void dispose(node* t);
 struct entry find( char* search, node *t );
-node* find_min( node *t );
-node* find_max( node *t );
 node* insert( struct entry movieEntry, node *t );
 node* delete( int data, node *t );
 void display_avl(node* t);
-int get( node* n );
-
 
 /*
     remove all nodes of an AVL tree
@@ -76,30 +72,6 @@ struct entry find(char* query, node* t )
   }
 }
 
-/*
-    find minimum node's key
-*/
-node* find_min( node* t )
-{
-  if( t == NULL )
-    return NULL;
-  else if( t->left == NULL )
-    return t;
-  else
-    return find_min( t->left );
-}
-
-/*
-    find maximum node's key
-*/
-node* find_max( node* t )
-{
-  if( t != NULL )
-    while( t->right != NULL )
-      t = t->right;
-
-  return t;
-}
 
 /*
     get the height of a node
@@ -255,16 +227,6 @@ node* delete( int e, node* t )
   printf( "Sorry; Delete is unimplemented; %d remains\n", e );
   return t;
 }
-
-/*
-    data data of a node
-*/
-/*
-int get(node* n)
-{
-    return n->data;
-}
-*/
 
 void display_avl(node* t)
 {
