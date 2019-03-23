@@ -134,10 +134,10 @@ void loadDatabase(node* tree){
       {
 	switch(counter){
 	case 0:
-	  strcpy(movieEntry.garbage, data);
+	  //strcpy(movieEntry.garbage, data);
 	  break;
 	case 1:
-	  strcpy(movieEntry.movie, data);
+	  //strcpy(movieEntry.movie, data);
 	  break;
 	case 2:
 	  strcpy(movieEntry.titleOrig, data);
@@ -148,13 +148,13 @@ void loadDatabase(node* tree){
 	  strcpy(movieEntry.title, data);
 	  break;
 	case 4:
-	  strcpy(movieEntry.isAdult, data);
+	  //strcpy(movieEntry.isAdult, data);
 	  break;
 	case 5:
 	  strcpy(movieEntry.releaseDate, data);
 	  break;
 	case 6:
-	  strcpy(movieEntry.endDate, data);
+	  //strcpy(movieEntry.endDate, data);
 	  break;
 	case 7:
 	  strcpy(movieEntry.runtimeMinutes, data);
@@ -178,7 +178,7 @@ void loadDatabase(node* tree){
   scanf("%[^\n]s", search);
   memcpy(search, strlwr(search), sizeof(strlwr(search)));
   removeArticles(search);
-  printf("%s\n", search);
+  // printf("%s\n", search);
   struct entry movieSearch = find(search, tree);
   printf("The genre(s) of %s is(are): %s\n", search, movieSearch.titleOrig);
   
