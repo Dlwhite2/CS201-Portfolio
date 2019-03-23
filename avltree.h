@@ -54,11 +54,13 @@ struct entry find(char* query, node* t )
     printf("Could not find any matches\n");
     return movie;
   }
+  
   if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
     return find( query, t->left );
   else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
     return find( query, t->right );
-  else if( (strncmp(query, t->movieInfo.titleMod, strlen(query)) == 0 && strlen(query) == strlen(t->movieInfo.titleMod))){
+  else if( (strncmp(query, t->movieInfo.titleMod, strlen(query)) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
+      printf("Found the exact match\n");
     strcpy(movie.title, t->movieInfo.title);
     strcpy(movie.titleOrig, t->movieInfo.titleOrig);
     strcpy(movie.titleMod, t->movieInfo.titleMod);
@@ -191,6 +193,9 @@ node* insert(struct entry movie/*int e*/, node* t)
 	  strcpy(t->movieInfo.releaseDate, movie.releaseDate);
 	  strcpy(t->movieInfo.runtimeMinutes, movie.runtimeMinutes);
 	  strcpy(t->movieInfo.genres, movie.genres);
+	  //USER INFO
+	  strcpy(t->movieInfo.acquireDate, movie.acquireDate);
+	  strcpy(t->movieInfo.mediaType, movie.mediaType);
 	  t->height = 0;
 	  t->left = t->right = NULL;
 	}
@@ -236,7 +241,7 @@ void display_avl(node* t, char *query)
   static int count = 1;
   static bool max = false;
   //printf("Query is: %s\n", query);
-  if (count == 51){
+  if (count == 31){
     //printf("\n\nThere are more than 50 search results! Please refine your search.\n\n");
     return;
   }
@@ -259,7 +264,7 @@ void display_avl(node* t, char *query)
   display_avl(t->right, query);
 
   if (max == true){
-    printf("\n\nThere are more than 50 results! Please refine your search.\n\n");
+    printf("\n\nThere are more than 30 results! Please refine your search.\n\n");
     max = false;
   }
   
