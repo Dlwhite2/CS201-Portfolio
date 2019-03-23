@@ -5,8 +5,9 @@
 //#include "avltree.h"
 
 typedef struct entry{
-  char titleOrig[100];
-  char title[100];
+  char titleOrig[200];
+  char title[200];
+  char titleMod[200];
   char releaseDate[15];
   char acquireDate[15];
   char mediaType[15];
@@ -49,21 +50,24 @@ void dispose(node* t)
 struct entry find(char* query, node* t )
 {
   struct entry movie = {0};
-  if( t == NULL )
+  if( t == NULL ){
+    printf("Could not find any matches\n");
     return movie;
-  if( strncmp(query, t->movieInfo.title, strlen(query)) < 0)//e < t->data )
+  }
+  if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
     return find( query, t->left );
-  else if( strncmp(query, t->movieInfo.title, strlen(query)) > 0)//e > t->data )
+  else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
     return find( query, t->right );
-  else if( strncmp(query, t->movieInfo.title, strlen(query)) == 0 && strlen(query) == strlen(t->movieInfo.title)){
+  else if( (strncmp(query, t->movieInfo.titleMod, strlen(query)) == 0 && strlen(query) == strlen(t->movieInfo.titleMod))){
     strcpy(movie.title, t->movieInfo.title);
     strcpy(movie.titleOrig, t->movieInfo.titleOrig);
+    strcpy(movie.titleMod, t->movieInfo.titleMod);
     strcpy(movie.releaseDate, t->movieInfo.releaseDate);
     strcpy(movie.runtimeMinutes, t->movieInfo.runtimeMinutes);
     strcpy(movie.genres, t->movieInfo.genres);
     return movie;
   }else{
-    printf("current node title: %s\n", t->movieInfo.titleOrig);
+    //printf("current node title: %s\n", t->movieInfo.titleOrig);
     display_avl(t, query);
     return movie;
   }
@@ -183,6 +187,7 @@ node* insert(struct entry movie/*int e*/, node* t)
 	  //t->title = e;
 	  strcpy(t->movieInfo.title, movie.title);
 	  strcpy(t->movieInfo.titleOrig, movie.titleOrig);
+	  strcpy(t->movieInfo.titleMod, movie.titleMod);
 	  strcpy(t->movieInfo.releaseDate, movie.releaseDate);
 	  strcpy(t->movieInfo.runtimeMinutes, movie.runtimeMinutes);
 	  strcpy(t->movieInfo.genres, movie.genres);
@@ -190,21 +195,21 @@ node* insert(struct entry movie/*int e*/, node* t)
 	  t->left = t->right = NULL;
 	}
     }
-  else if( strcmp(movie.title, t->movieInfo.title)<0)//e < t->data )
+  else if( strcmp(movie.titleMod, t->movieInfo.titleMod)<0)//e < t->data )
     {
       t->left = insert(movie, t->left );
       if(height(t->left)-height(t->right) == 2){
-	if( strcmp(movie.title, t->left->movieInfo.title) < 0)//e < t->left->data )
+	if( strcmp(movie.titleMod, t->left->movieInfo.titleMod) < 0)//e < t->left->data )
 	  t = single_rotate_with_left( t );
 	else
 	  t = double_rotate_with_left( t );
       }
     }
-  else if( strcmp(movie.title, t->movieInfo.title) > 0)//e > t->data )
+  else if( strcmp(movie.titleMod, t->movieInfo.titleMod) > 0)//e > t->data )
     {
       t->right = insert(movie, t->right );
       if(height(t->right)-height(t->left) == 2){
-	if( strcmp(movie.title, t->right->movieInfo.title) > 0)//e > t->right->data )
+	if( strcmp(movie.titleMod, t->right->movieInfo.titleMod) > 0)//e > t->right->data )
 	  t = single_rotate_with_right( t );
 	else
 	  t = double_rotate_with_right( t );
@@ -213,6 +218,7 @@ node* insert(struct entry movie/*int e*/, node* t)
   /* Else X is in the tree already; we'll do nothing */
 
   t->height = max( height( t->left ), height( t->right ) ) + 1;
+  // printf("TitleOrig: %s \t TitleOrigMod: %s\n", t->movieInfo.titleOrig, t->movieInfo.titleOrigMod);
   return t;
 }
 
@@ -238,13 +244,11 @@ void display_avl(node* t, char *query)
   if (t == NULL)
     return;
 
-  if (strcmp(t->movieInfo.titleOrig, "Vespiary") == 0){
-    if (strstr(t->movieInfo.title, query) != NULL)
-      printf("%s is contained in %s\n", query, t->movieInfo.title);
-  }
-
-  if (strstr(t->movieInfo.title, query) != NULL){
-     printf("%d) %s\n", count, t->movieInfo.titleOrig);
+  if (strstr(t->movieInfo.titleMod, query) != NULL){
+    if (strcmp(t->movieInfo.titleOrig, t->movieInfo.title) != 0)
+      printf("%d) %s (%s)\n", count, t->movieInfo.title, t->movieInfo.titleOrig);
+    else
+      printf("%d) %s\n", count, t->movieInfo.title);
      count++;
      if (count == 51)
        max = true;

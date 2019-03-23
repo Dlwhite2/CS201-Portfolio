@@ -132,6 +132,7 @@ void loadDatabase(node* tree){
     data = strtok (line,"\t");
     while (data != NULL)
       {
+	char *newInfo;
 	switch(counter){
 	case 0:
 	  //strcpy(movieEntry.garbage, data);
@@ -143,9 +144,15 @@ void loadDatabase(node* tree){
 	  strcpy(movieEntry.titleOrig, data);
 	  break;
 	case 3:
-	  memcpy(data, strlwr(data), sizeof(strlwr(data)));
-	  removeArticles(data);
+	  newInfo = (char*)malloc(strlen(data));
+	  //Save a copy of the unmodified title
 	  strcpy(movieEntry.title, data);
+	  
+	  strcpy(newInfo, strlwr(data));
+	  removeArticles(newInfo);
+	  strcpy(movieEntry.titleMod, newInfo);
+	  //printf("title: %s \tmod: %s\n", movieEntry.title, movieEntry.titleMod);
+	  free(newInfo);
 	  break;
 	case 4:
 	  //strcpy(movieEntry.isAdult, data);
@@ -178,7 +185,7 @@ void loadDatabase(node* tree){
   scanf("%[^\n]s", search);
   memcpy(search, strlwr(search), sizeof(strlwr(search)));
   removeArticles(search);
-  // printf("%s\n", search);
+  printf("%s\n", search);
   struct entry movieSearch = find(search, tree);
   printf("The genre(s) of %s is(are): %s\n", search, movieSearch.titleOrig);
   
@@ -196,6 +203,8 @@ char *strlwr(char *string){
       newString[i] = string[i];
     }
   }
+  //if (strcmp(string, "Edge of Tomorrow") == 0)
+  //printf("Right before \"return newString;\", newString is: %s\n", newString);
   return newString;
 }
 
