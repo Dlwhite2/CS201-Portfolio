@@ -3,12 +3,12 @@
 #include <string.h>
 #include "avltree.h"
 
-void createEntry(node*, node*);
+node* createEntry(node*, node*);
 void readEntry(node*, node*);
 void updateEntry(node*, node*);
 void deleteEntry(node*, node*);
 node* loadDatabase(node*);
-void loadLog();
+node* loadUserLibrary(FILE*);
 void saveLog();
 void helpMsg(char*);
 int commandFormatIsCorrect(char*);
@@ -21,24 +21,29 @@ int main(void){
   node *tree = NULL;
   tree = loadDatabase(tree);
   if (tree == NULL)
-    printf("tree is null after being loaded\n");
+    printf("There was an error loading the database.\n");
   char state[50];
   char userName[50];
   printf("Welcome to your home theater library.\nPlease enter in your user name in the form [first_last]\n");
   scanf("%s", userName);
   printf("\nHello there, %s\n", userName);
 
+  node *library = NULL;
+  
   FILE * log;
   log = fopen(userName, "r");
   if (log){
-    loadLog();
     fclose(log);
     log = fopen(userName, "w");
+    library = loadUserLibrary(log);
+    if (library == NULL)
+      printf("There was an error loading the user library.\n");
   } else {
     log = fopen(userName, "w");
   }
-
-  node *library = NULL;
+  
+  
+  
 
   char cmdMsg[] = "Please enter a command or 'e' to exit: \n\t'c' to create an entry in your library\n\t'r' to read an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n";
   printf("%s", cmdMsg);
@@ -50,7 +55,7 @@ int main(void){
   while(state[0] != 'e'){
     switch(state[0]){
     case 'c':
-      createEntry(tree, library);
+      library = createEntry(tree, library);
       break;
     case 'r':
       readEntry(tree, library);
@@ -87,7 +92,7 @@ int commandFormatIsCorrect(char state[]){
   }
 }
 
-void createEntry(node *tree, node *library){
+node* createEntry(node *tree, node *library){
   getchar();
   printf("Creating entry\n");
   printf("Search the name of the movie you would like to add to your library: ");
@@ -98,7 +103,6 @@ void createEntry(node *tree, node *library){
     movie = search(tree);
   }
   getchar();
-  printf("The movie it thinks it found is %s.\n", movie.title);
   //Ask about other info
   char aquireDate[10];
   char mediaType[10];
@@ -108,9 +112,12 @@ void createEntry(node *tree, node *library){
   printf("\nWhat type of media is the movie?\n\tOptions:\n\t\t\"DVD\"\n\t\t\"BR\" for BluRay\n\t\t\"VCR\"\n\t\t\"DC\" for Digital Copy\nMedia Type: ");
   scanf("%[^\n]s", mediaType);
   getchar();
+  if (library == NULL)
+    printf("Library is null\n");
   library = insert(movie, library);
   printf("\n\n%s has been added to your movie library!\n\n", movie.title);
-  return;
+  displayTree(library);
+  return library;
 }
 
 
@@ -212,12 +219,17 @@ node* loadDatabase(node* tree){
   return tree;
 }
 
+node* loadUserLibrary(FILE* logFile){
+  node* library = {0};
+  
+  return library;
+}
+
 struct entry search(node *tree){
   char search[150];
   scanf("%[^\n]s", search);
   memcpy(search, strlwr(search), sizeof(strlwr(search)));
   removeArticles(search);
-  printf("%s\n", search);
   struct entry movieSearch = find(search, tree);
   return movieSearch;
 }

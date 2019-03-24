@@ -28,7 +28,8 @@ void dispose(node* t);
 struct entry find( char* search, node *t );
 node* insert( struct entry movieEntry, node *t );
 node* delete( int data, node *t );
-void display_avl(node* t, char* query);
+void displayMatches(node* t, char* query);
+void displayTree(node* t);
 
 /*
     remove all nodes of an AVL tree
@@ -60,7 +61,6 @@ struct entry find(char* query, node* t )
   else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
     return find( query, t->right );
   else if( (strncmp(query, t->movieInfo.titleMod, strlen(query)) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
-      printf("Found the exact match\n");
     strcpy(movie.title, t->movieInfo.title);
     strcpy(movie.titleOrig, t->movieInfo.titleOrig);
     strcpy(movie.titleMod, t->movieInfo.titleMod);
@@ -69,8 +69,7 @@ struct entry find(char* query, node* t )
     strcpy(movie.genres, t->movieInfo.genres);
     return movie;
   }else{
-    //printf("current node title: %s\n", t->movieInfo.titleOrig);
-    display_avl(t, query);
+    displayMatches(t, query);
     return movie;
   }
 }
@@ -236,7 +235,7 @@ node* delete( int e, node* t )
   return t;
 }
 
-void display_avl(node* t, char *query)
+void displayMatches(node* t, char *query)
 {
   static int count = 1;
   static bool max = false;
@@ -260,12 +259,27 @@ void display_avl(node* t, char *query)
   }
   
   // printf("Stop print\n");
-  display_avl(t->left, query);
-  display_avl(t->right, query);
+  displayMatches(t->left, query);
+  displayMatches(t->right, query);
 
   if (max == true){
     printf("\n\nThere are more than 30 results! Please refine your search.\n\n");
     max = false;
   }
   
+}
+void displayTree(node* t){
+
+  if (t == NULL)
+    return;
+  printf("%s",t->movieInfo.title);
+
+  if(t->left != NULL)
+    printf("(L:%s)",t->left->movieInfo.title);
+  if(t->right != NULL)
+    printf("(R:%s)",t->right->movieInfo.title);
+  printf("\n");
+
+  displayTree(t->left);
+  displayTree(t->right);
 }
