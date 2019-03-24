@@ -46,7 +46,7 @@ void dispose(node* t)
 
 /*
     find a specific node's key in the tree
-*/
+v*/
 
 struct entry find(char* query, node* t )
 {
@@ -55,6 +55,8 @@ struct entry find(char* query, node* t )
     printf("Could not find any matches\n");
     return movie;
   }
+
+  printf("Comparing --%s-- with --%s--\n", query, t->movieInfo.titleMod);
   
   if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
     return find( query, t->left );
@@ -65,6 +67,8 @@ struct entry find(char* query, node* t )
     strcpy(movie.titleOrig, t->movieInfo.titleOrig);
     strcpy(movie.titleMod, t->movieInfo.titleMod);
     strcpy(movie.releaseDate, t->movieInfo.releaseDate);
+    strcpy(movie.acquireDate, t->movieInfo.acquireDate);
+    strcpy(movie.mediaType, t->movieInfo.mediaType);
     strcpy(movie.runtimeMinutes, t->movieInfo.runtimeMinutes);
     strcpy(movie.genres, t->movieInfo.genres);
     return movie;
@@ -193,6 +197,7 @@ node* insert(struct entry movie/*int e*/, node* t)
 	  strcpy(t->movieInfo.runtimeMinutes, movie.runtimeMinutes);
 	  strcpy(t->movieInfo.genres, movie.genres);
 	  //USER INFO
+	  //printf("mediaType: %s\n", movie.mediaType);
 	  strcpy(t->movieInfo.acquireDate, movie.acquireDate);
 	  strcpy(t->movieInfo.mediaType, movie.mediaType);
 	  t->height = 0;

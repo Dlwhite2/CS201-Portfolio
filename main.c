@@ -16,7 +16,6 @@ char* strlwr(char*);
 void removeArticles(char*);
 struct entry search(node*);
 
-
 int main(void){
   node *tree = NULL;
   tree = loadDatabase(tree);
@@ -29,7 +28,7 @@ int main(void){
   printf("\nHello there, %s\n", userName);
 
   node *library = NULL;
-  
+ 
   FILE * log;
   log = fopen(userName, "r");
   if (log){
@@ -41,12 +40,13 @@ int main(void){
   } else {
     log = fopen(userName, "w");
   }
-  
-  
-  
-
+ 
+ 
   char cmdMsg[] = "Please enter a command or 'e' to exit: \n\t'c' to create an entry in your library\n\t'r' to read an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n";
+
   printf("%s", cmdMsg);
+
+
 
   scanf("%s", state);
   while (!commandFormatIsCorrect(state)){
@@ -77,9 +77,9 @@ int main(void){
       scanf("%s", state);
     }
   }
+
   printf("Your log is being saved in %s in the directory where this program is installed.\n", userName);
   saveLog();
-
   return 0;
 }
 
@@ -104,25 +104,37 @@ node* createEntry(node *tree, node *library){
   }
   getchar();
   //Ask about other info
-  char aquireDate[10];
+  char acquireDate[10];
   char mediaType[10];
   printf("When did you buy the movie? MM/YYYY = ");
-  scanf("%[^\n]s", aquireDate);
+  scanf("%[^\n]s", acquireDate);
   getchar();
   printf("\nWhat type of media is the movie?\n\tOptions:\n\t\t\"DVD\"\n\t\t\"BR\" for BluRay\n\t\t\"VCR\"\n\t\t\"DC\" for Digital Copy\nMedia Type: ");
   scanf("%[^\n]s", mediaType);
   getchar();
+  
+  strcpy(movie.acquireDate, acquireDate);
+  strcpy(movie.mediaType, mediaType);
+  
   if (library == NULL)
     printf("Library is null\n");
   library = insert(movie, library);
-  printf("\n\n%s has been added to your movie library!\n\n", movie.title);
-  displayTree(library);
+  printf("\n%s has been added to your movie library!\n\n", movie.title);
+  // displayTree(library);
   return library;
 }
 
-
 void readEntry(node *tree, node *library){
+  getchar();
   printf("Reading entry\n");
+  printf("Search the name of the movie in your movie library that you would like to know about: ");
+  struct entry movie = search(library);
+  struct entry temp = {0};
+  while(strcmp(movie.title, temp.title) == 0){
+    getchar();
+    movie = search(library);
+  }
+  printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
   return;
 }
 
@@ -180,12 +192,19 @@ node* loadDatabase(node* tree){
 	  newInfo = (char*)malloc(strlen(data));
 	  //Save a copy of the unmodified title
 	  strcpy(movieEntry.title, data);
-	  
-	  strcpy(newInfo, strlwr(data));
-	  removeArticles(newInfo);
-	  strcpy(movieEntry.titleMod, newInfo);
-	  //printf("title: %s \tmod: %s\n", movieEntry.title, movieEntry.titleMod);
-	  free(newInfo);
+	 
+	  if (strcmp(movieEntry.title, "Cloudy with a Chance of Meatballs") == 0){
+	    strcpy(newInfo, strlwr(data));
+	    printf("newInfo after strlwr: %s\n", newInfo);
+	    removeArticles(newInfo);
+	    printf("newInfo after removeArticles: %s\n", newInfo);
+	    strcpy(movieEntry.titleMod, newInfo);
+	    printf("title: %s \tmod: %s\n", movieEntry.title, movieEntry.titleMod);
+	  } else{
+	    memcpy(newInfo, strlwr(data), sizeof(strlwr(data)));
+	    removeArticles(newInfo);
+	    strcpy(movieEntry.titleMod, newInfo);
+	  }
 	  break;
 	case 4:
 	  //strcpy(movieEntry.isAdult, data);
@@ -221,15 +240,23 @@ node* loadDatabase(node* tree){
 
 node* loadUserLibrary(FILE* logFile){
   node* library = {0};
-  
   return library;
 }
 
 struct entry search(node *tree){
   char search[150];
   scanf("%[^\n]s", search);
-  memcpy(search, strlwr(search), sizeof(strlwr(search)));
-  removeArticles(search);
+  char *newInfo;
+  newInfo = (char*)malloc(strlen(strlwr(search)));
+	  strcpy(newInfo, strlwr(search));
+	  printf("Right before removeArticles, search is: %s\n", newInfo);
+	  removeArticles(newInfo);
+	  strcpy(search, newInfo);
+  
+	  //memcpy(search, strlwr(search), sizeof(strlwr(search)));
+	  //printf("After strlwr, search is now: %s\n", search);
+  //removeArticles(search);
+  printf("Search is now: %s\n", search);
   struct entry movieSearch = find(search, tree);
   return movieSearch;
 }
@@ -237,6 +264,7 @@ struct entry search(node *tree){
 char *strlwr(char *string){
   char *newString = (char*)malloc(strlen(string));
   int i;
+  //strcpy(newString, strupr(string));
   for(i = 0; i < strlen(string); i++){
     if(string[i] >= 'A' && string[i] <= 'Z' && string[i] != '\0'){
       newString[i] = string[i] + 32;
@@ -244,8 +272,8 @@ char *strlwr(char *string){
       newString[i] = string[i];
     }
   }
-  //if (strcmp(string, "Edge of Tomorrow") == 0)
-  //printf("Right before \"return newString;\", newString is: %s\n", newString);
+  if (strcmp(string, "Cloudy with a Chance of Meatballs") == 0)
+   printf("Right before \"return newString;\", newString is: %s\n", newString);
   return newString;
 }
 
