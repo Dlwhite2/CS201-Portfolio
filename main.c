@@ -9,10 +9,10 @@ void updateEntry(node*, node*);
 void deleteEntry(node*, node*);
 node* loadDatabase(node*);
 node* loadUserLibrary(FILE*);
-void saveLog();
+void saveLog(FILE*, node*);
 void helpMsg(char*);
 int commandFormatIsCorrect(char*);
-char* strlwr(char*);
+void strlwr(char*);
 void removeArticles(char*);
 struct entry search(node*);
 
@@ -79,7 +79,7 @@ int main(void){
   }
 
   printf("Your log is being saved in %s in the directory where this program is installed.\n", userName);
-  saveLog();
+  saveLog(log, library);
   return 0;
 }
 
@@ -116,10 +116,10 @@ node* createEntry(node *tree, node *library){
   strcpy(movie.acquireDate, acquireDate);
   strcpy(movie.mediaType, mediaType);
   
-  if (library == NULL)
-    printf("Library is null\n");
+  //if (library == NULL)
+  //printf("Library is null\n");
   library = insert(movie, library);
-  printf("\n%s has been added to your movie library!\n\n", movie.title);
+  printf("\n\"%s\" has been added to your movie library!\n\n", movie.title);
   // displayTree(library);
   return library;
 }
@@ -128,11 +128,14 @@ void readEntry(node *tree, node *library){
   getchar();
   printf("Reading entry\n");
   printf("Search the name of the movie in your movie library that you would like to know about: ");
-  struct entry movie = search(library);
+  struct entry movie = {0}; 
   struct entry temp = {0};
+  movie = search(library);
+  getchar();
   while(strcmp(movie.title, temp.title) == 0){
-    getchar();
     movie = search(library);
+    getchar();
+    printf("Please try another search.\n");
   }
   printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
   return;
@@ -158,9 +161,27 @@ void loadLog(){
   return;
 }
 
-void saveLog(){
-  printf("The log that was created in memory should be written to the log file here.\n");
-  return;
+void saveLog(FILE *log, node *library){
+  //printf("The log that was created in memory should be written to the log file here.\n");
+  if (library == NULL){
+    fclose(log);
+    return;
+  }
+
+ fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
+	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres); 
+  
+  if (library->left != NULL){
+    fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->left->movieInfo.titleOrig, library->left->movieInfo.title, library->left->movieInfo.releaseDate, library->left->movieInfo.acquireDate,
+	    library->left->movieInfo.runtimeMinutes, library->left->movieInfo.mediaType, library->left->movieInfo.genres);
+  }
+  if (library->right != NULL){
+    fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->right->movieInfo.titleOrig, library->right->movieInfo.title, library->right->movieInfo.releaseDate, library->right->movieInfo.acquireDate,
+	    library->right->movieInfo.runtimeMinutes, library->right->movieInfo.mediaType, library->right->movieInfo.genres);
+  }
+  
+    saveLog(log, library->left);
+    saveLog(log, library->right);
 }
 
 node* loadDatabase(node* tree){
@@ -177,7 +198,7 @@ node* loadDatabase(node* tree){
     data = strtok (line,"\t");
     while (data != NULL)
       {
-	char *newInfo;
+	//char *newInfo;
 	switch(counter){
 	case 0:
 	  //strcpy(movieEntry.garbage, data);
@@ -189,21 +210,23 @@ node* loadDatabase(node* tree){
 	  strcpy(movieEntry.titleOrig, data);
 	  break;
 	case 3:
-	  newInfo = (char*)malloc(strlen(data));
+	  //newInfo = (char*)malloc(strlen(data));
 	  //Save a copy of the unmodified title
 	  strcpy(movieEntry.title, data);
 	 
 	  if (strcmp(movieEntry.title, "Cloudy with a Chance of Meatballs") == 0){
-	    strcpy(newInfo, strlwr(data));
-	    printf("newInfo after strlwr: %s\n", newInfo);
-	    removeArticles(newInfo);
-	    printf("newInfo after removeArticles: %s\n", newInfo);
-	    strcpy(movieEntry.titleMod, newInfo);
+	    strlwr(data);
+	    //strcpy(newInfo, strlwr(data));
+	    printf("newInfo after strlwr: %s\n", data);
+	    removeArticles(data);
+	    printf("newInfo after removeArticles: %s\n", data);
+	    strcpy(movieEntry.titleMod, data);
 	    printf("title: %s \tmod: %s\n", movieEntry.title, movieEntry.titleMod);
 	  } else{
-	    memcpy(newInfo, strlwr(data), sizeof(strlwr(data)));
-	    removeArticles(newInfo);
-	    strcpy(movieEntry.titleMod, newInfo);
+	    strlwr(data);
+	    //memcpy(newInfo, strlwr(data), sizeof(strlwr(data)));
+	    removeArticles(data);
+	    strcpy(movieEntry.titleMod, data);
 	  }
 	  break;
 	case 4:
@@ -246,35 +269,27 @@ node* loadUserLibrary(FILE* logFile){
 struct entry search(node *tree){
   char search[150];
   scanf("%[^\n]s", search);
-  char *newInfo;
-  newInfo = (char*)malloc(strlen(strlwr(search)));
-	  strcpy(newInfo, strlwr(search));
-	  printf("Right before removeArticles, search is: %s\n", newInfo);
-	  removeArticles(newInfo);
-	  strcpy(search, newInfo);
-  
-	  //memcpy(search, strlwr(search), sizeof(strlwr(search)));
-	  //printf("After strlwr, search is now: %s\n", search);
-  //removeArticles(search);
+  strlwr(search);
+  printf("Right before removeArticles, search is: %s\n", search);
+  removeArticles(search);
   printf("Search is now: %s\n", search);
   struct entry movieSearch = find(search, tree);
   return movieSearch;
 }
 
-char *strlwr(char *string){
-  char *newString = (char*)malloc(strlen(string));
+void strlwr(char *string){
+  //char *newString = (char*)malloc(strlen(string));
   int i;
   //strcpy(newString, strupr(string));
   for(i = 0; i < strlen(string); i++){
     if(string[i] >= 'A' && string[i] <= 'Z' && string[i] != '\0'){
-      newString[i] = string[i] + 32;
+      string[i] = string[i] + 32;
     } else {
-      newString[i] = string[i];
+      string[i] = string[i];
     }
   }
   if (strcmp(string, "Cloudy with a Chance of Meatballs") == 0)
-   printf("Right before \"return newString;\", newString is: %s\n", newString);
-  return newString;
+   printf("Right before \"return newString;\", newString is: %s\n", string);
 }
 
 void removeArticles (char *string) {

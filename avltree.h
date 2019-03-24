@@ -62,7 +62,7 @@ struct entry find(char* query, node* t )
     return find( query, t->left );
   else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
     return find( query, t->right );
-  else if( (strncmp(query, t->movieInfo.titleMod, strlen(query)) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
+  else if( (strcmp(query, t->movieInfo.titleMod) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
     strcpy(movie.title, t->movieInfo.title);
     strcpy(movie.titleOrig, t->movieInfo.titleOrig);
     strcpy(movie.titleMod, t->movieInfo.titleMod);
