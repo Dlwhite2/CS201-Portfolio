@@ -27,10 +27,12 @@ typedef struct node
 
 void dispose(node* t);
 struct entry find( char* search, node *t );
+struct node* findNode(char* search, node *t);
 node* insert( struct entry movieEntry, node *t );
 node* delete( int data, node *t );
 void displayMatches(node* t, char* query);
 void displayTree(node* t);
+void printTree(node* library);
 
 /*
 
@@ -39,30 +41,21 @@ void displayTree(node* t);
 */
 
 void dispose(node* t)
-
 {
-
   if( t != NULL )
-
     {
-
       dispose( t->left );
-
       dispose( t->right );
-
       free( t );
-
     }
-
 }
-
 
 
 struct entry find(char* query, node* t )
 {
   struct entry movie = {0};
   if( t == NULL ){
-    printf("Could not find any matches\n");
+    printf("Could not find any matches. Please edit or refine your search.\n");
     return movie;
   }
 
@@ -85,6 +78,29 @@ struct entry find(char* query, node* t )
   }else{
     displayMatches(t, query);
     return movie;
+  }
+}
+
+
+struct node* findNode(char* query, node* t )
+{
+  struct node* temp = NULL;
+  if( t == NULL ){
+    printf("Could not find any matches\n");
+    return temp;
+  }
+
+  //printf("Comparing --%s-- with --%s--\n", query, t->movieInfo.titleMod);
+  
+  if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
+    return findNode( query, t->left );
+  else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
+    return findNode( query, t->right );
+  else if( (strcmp(query, t->movieInfo.titleMod) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
+    return t;
+  }else{
+    displayMatches(t, query);
+    return t;
   }
 }
 
@@ -287,4 +303,18 @@ void displayTree(node* t){
 
   displayTree(t->left);
   displayTree(t->right);
+}
+
+
+void printTree(node *library){
+  if (library == NULL){
+    return;
+  }
+  
+
+  printf("%s(Orig: %s)\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.title, library->movieInfo.titleOrig, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
+         library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
+
+    printTree(library->left);
+    printTree(library->right);
 }

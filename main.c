@@ -4,9 +4,9 @@
 #include "avltree.h"
 
 node* createEntry(node*, node*);
-void readEntry(node*, node*);
-void updateEntry(node*, node*);
-void deleteEntry(node*, node*);
+void readEntry(node*);
+node* updateEntry(node*);
+void deleteEntry(node*);
 node* loadDatabase(node*);
 node* loadUserLibrary(FILE*, node*);
 void saveLog(FILE*, node*);
@@ -14,6 +14,7 @@ void helpMsg(char*);
 int commandFormatIsCorrect(char*);
 void removeArticles(char*);
 struct entry search(node*);
+struct node* searchNode(node*);
 
 int main(void){
   node *tree = NULL;
@@ -31,11 +32,10 @@ int main(void){
   FILE * log;
   log = fopen(userName, "r");
   if (log){
-    //log = fopen(userName, "r");
     library = loadUserLibrary(log, library);
     if (library == NULL)
-      printf("There was an error loading the user library.\n");
-    fclose(log);
+      printf("The library was empty!\n");
+    //fclose(log);
     log = fopen(userName, "w");
   } else {
     log = fopen(userName, "w");
@@ -55,13 +55,16 @@ int main(void){
       library = createEntry(tree, library);
       break;
     case 'r':
-      readEntry(tree, library);
+      readEntry(library);
       break;
     case 'u':
-      updateEntry(tree, library);
+      library = updateEntry(library);
       break;
     case 'd':
-      deleteEntry(tree, library);
+      deleteEntry(library);
+      break;
+    case 'p':
+      printTree(library);
       break;
     default:
       helpMsg(state);
@@ -77,7 +80,7 @@ int main(void){
   printf("Your log is being saved in %s in the directory where this program is installed.\n", userName);
 
   saveLog(log, library);
-
+  fclose(log);
   return 0;
 }
 
@@ -120,30 +123,77 @@ node* createEntry(node *tree, node *library){
   return library;
 }
 
-void readEntry(node *tree, node *library){
+void readEntry(node *library){
   getchar();
   printf("Reading entry\n");
   printf("Search the name of the movie in your movie library that you would like to know about: ");
   struct entry movie = {0}; 
-  struct entry temp = {0};
   movie = search(library);
   getchar();
-  while(strcmp(movie.title, temp.title) == 0){
-    movie = search(library);
-    getchar();
-    printf("Please try another search.\n");
-  }
   printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
   return;
 }
 
 
-void updateEntry(node *tree, node *library){
+struct node* updateEntry(node *library){
   printf("Updating entry\n");
-  return;
+  char newInfo[200];
+  getchar();
+  printf("Enter the name of the movie in your library that you would like to update: ");
+  struct node* movieNode = searchNode(library);
+  struct entry temp = {0};
+  while (strcmp(movieNode->movieInfo.title, temp.title) == 0){
+    getchar();
+    movieNode = searchNode(library);
+  }
+  //printf("The found movie was %s\n", movieNode->movieInfo.title);
+  int choice;
+  printf("Please select the number of the object you would like to update:\n\t1) Title\n\t2) Release Date\n\t3) Acquire Date\n\t4) Media Type\n\t5) Genres\n\t6) Quit\n\nOption: ");
+  scanf("%d", &choice);
+    switch(choice){
+    case 0:
+      break;
+    case 1:
+      getchar();
+      printf("Please enter the new Title: ");
+      scanf("%[^\n]s", newInfo);
+      strcpy(movieNode->movieInfo.title, newInfo);
+      strlwr(newInfo);
+      removeArticles(newInfo);
+      strcpy(movieNode->movieInfo.titleMod, newInfo);
+      break;
+    case 2:
+      getchar();
+      printf("Please enter the new Release Date: ");
+      scanf("%[^\n]s", newInfo);
+      strcpy(movieNode->movieInfo.releaseDate, newInfo);
+      break;
+    case 3:
+      getchar();
+      printf("Please enter the new Acquire Date: ");
+      scanf("%[^\n]s", newInfo);
+      strcpy(movieNode->movieInfo.acquireDate, newInfo);
+      break;
+    case 4:
+      getchar();
+      printf("Please enter the new Media Type: ");
+      scanf("%[^\n]s", newInfo);
+      strcpy(movieNode->movieInfo.mediaType, newInfo);
+      break;
+    case 5:
+      getchar();
+      printf("Please enter the new Genre(s): ");
+      scanf("%[^\n]s", newInfo);
+      strcpy(movieNode->movieInfo.genres, newInfo);
+      break;
+    default:
+      choice = 0;
+    }
+    //getchar();
+  return movieNode;
 }
 
-void deleteEntry(node *tree, node *library){
+void deleteEntry(node *library){
   printf("Deleting entry\n");
   return;
 }
@@ -153,18 +203,17 @@ void helpMsg(char state[]){
   return;
 }
 
-void loadLog(){
-  printf("The existing log should bew loaded into memory here.\n");
-  return;
-}
 
 void saveLog(FILE *log, node *library){
-  if (library == NULL){
-    fclose(log);
+  if (library == NULL){// && library->left == NULL && library->right == NULL){
+    //fclose(log);
     return;
   }
 
  fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
+	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
+
+ printf("Just Printed: %s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
 	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
 
     saveLog(log, library->left);
@@ -238,6 +287,18 @@ struct entry search(node *tree){
   
   return movieSearch;
 }
+
+struct node* searchNode(node *library){
+
+  char search[150];
+  scanf("%[^\n]s", search);
+  strlwr(search);
+  removeArticles(search);
+  struct node* t = findNode(search, library);
+  
+  return t;
+}
+
 
 node* loadUserLibrary(FILE *log, node *library){
   printf("\nLoading your movie library...\n");
