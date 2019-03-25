@@ -4,7 +4,7 @@
 #include "avltree.h"
 
 node* createEntry(node*, node*);
-void readEntry(node*);
+void retrieveEntry(node*);
 node* updateEntry(node*);
 node* deleteEntry(node*);
 node* loadDatabase(node*);
@@ -13,8 +13,9 @@ void saveLog(FILE*, node*);
 void helpMsg(char*);
 int commandFormatIsCorrect(char*);
 void removeArticles(char*);
-struct entry search(node*);
-struct node* searchNode(node*);
+entry search(node*);
+node* searchNode(node*);
+void printMovie(entry);
 
 int main(void){
   node *tree = NULL;
@@ -27,6 +28,8 @@ int main(void){
   scanf("%s", userName);
   printf("\nHello there, %s\n", userName);
 
+  strcat(userName, ".txt");
+  
   node *library = NULL;
  
   FILE * log;
@@ -42,7 +45,7 @@ int main(void){
   }
  
  
-  char cmdMsg[] = "Please enter a command or 'e' to exit: \n\t'c' to create an entry in your library\n\t'r' to regad an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n\t'p' to print out all of the movies in your library\n";
+  char cmdMsg[] = "Please enter a command or 'e' to exit: \n\t'c' to create an entry in your library\n\t'r' to retrieve an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n\t'p' to print out all of the movies in your library\n";
 
   printf("%s", cmdMsg);
   scanf("%s", state);
@@ -55,13 +58,13 @@ int main(void){
       library = createEntry(tree, library);
       break;
     case 'r':
-      readEntry(library);
+      retrieveEntry(library);
       break;
     case 'u':
       library = updateEntry(library);
       break;
     case 'd':
-      deleteEntry(library);
+      library = deleteEntry(library);
       break;
     case 'p':
       printTree(library);
@@ -97,13 +100,15 @@ node* createEntry(node *tree, node *library){
   getchar();
   printf("Creating entry\n");
   printf("Search the name of the movie you would like to add to your library: ");
-  struct entry movie = search(tree);
-  struct entry temp = {0};
+  entry movie = search(tree);
+  //getchar();
+  entry temp = {0};
   while(strcmp(movie.title, temp.title) == 0){
-    getchar();
+    //getchar();
     movie = search(tree);
+    //getchar();
   }
-  getchar();
+  
   //Ask about other info
   char acquireDate[10];
   char mediaType[10];
@@ -123,13 +128,13 @@ node* createEntry(node *tree, node *library){
   return library;
 }
 
-void readEntry(node *library){
+void retrieveEntry(node *library){
   getchar();
   printf("Reading entry\n");
   printf("Search the name of the movie in your movie library that you would like to know about: ");
   struct entry movie = {0}; 
   movie = search(library);
-  getchar();
+  //getchar();
   printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
   return;
 }
@@ -143,18 +148,17 @@ struct node* updateEntry(node *library){
   struct node* movieNode = searchNode(library);
   struct entry temp = {0};
   while (strcmp(movieNode->movieInfo.title, temp.title) == 0){
-    getchar();
     movieNode = searchNode(library);
   }
   //printf("The found movie was %s\n", movieNode->movieInfo.title);
   int choice;
   printf("Please select the number of the object you would like to update:\n\t1) Title\n\t2) Release Date\n\t3) Acquire Date\n\t4) Media Type\n\t5) Genres\n\t6) Quit\n\nOption: ");
   scanf("%d", &choice);
+  getchar();
     switch(choice){
     case 0:
       break;
     case 1:
-      getchar();
       printf("Please enter the new Title: ");
       scanf("%[^\n]s", newInfo);
       strcpy(movieNode->movieInfo.title, newInfo);
@@ -163,25 +167,22 @@ struct node* updateEntry(node *library){
       strcpy(movieNode->movieInfo.titleMod, newInfo);
       break;
     case 2:
-      getchar();
       printf("Please enter the new Release Date: ");
       scanf("%[^\n]s", newInfo);
       strcpy(movieNode->movieInfo.releaseDate, newInfo);
       break;
     case 3:
-      getchar();
       printf("Please enter the new Acquire Date: ");
       scanf("%[^\n]s", newInfo);
       strcpy(movieNode->movieInfo.acquireDate, newInfo);
       break;
     case 4:
-      getchar();
+
       printf("Please enter the new Media Type: ");
       scanf("%[^\n]s", newInfo);
       strcpy(movieNode->movieInfo.mediaType, newInfo);
       break;
     case 5:
-      getchar();
       printf("Please enter the new Genre(s): ");
       scanf("%[^\n]s", newInfo);
       strcpy(movieNode->movieInfo.genres, newInfo);
@@ -189,18 +190,18 @@ struct node* updateEntry(node *library){
     default:
       choice = 0;
     }
-    //getchar();
+    getchar();
   return movieNode;
 }
 
 node* deleteEntry(node *library){
   printf("Deleting entry\n");
   printf("Search the name of the movie you would like to delete from your library: ");
-  //char nodeName[200];
-  //scanf("%[^\n]s", nodeName);
-  struct node* nodeToDelete = searchNode(library);
-  printf("The genres for the node to delete are: %s\n", nodeToDelete->movieInfo.genres);
-  return nodeToDelete;
+  getchar();
+  entry movieToDelete = search(library);
+  printf("The genres for the node to delete are: %s\n", movieToDelete.genres);
+  library = delete(library, movieToDelete);
+  return library;
 }
 
 void helpMsg(char state[]){
@@ -218,8 +219,8 @@ void saveLog(FILE *log, node *library){
  fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
 	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
 
- printf("Just Printed: %s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
-	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
+ //printf("Just Printed: %s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
+ //	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
 
     saveLog(log, library->left);
     saveLog(log, library->right);
@@ -285,7 +286,9 @@ node* loadDatabase(node* tree){
 
 struct entry search(node *tree){
   char search[150];
+  //getchar();
   scanf("%[^\n]s", search);
+  getchar();
   strlwr(search);
   removeArticles(search);
   struct entry movieSearch = find(search, tree);
@@ -297,6 +300,7 @@ struct node* searchNode(node *library){
 
   char search[150];
   scanf("%[^\n]s", search);
+  getchar();
   strlwr(search);
   removeArticles(search);
   struct node* t = findNode(search, library);
@@ -366,3 +370,8 @@ void removeArticles (char *string) {
     }
   }
 }
+
+void printNode(entry movie){
+    printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
+    return;
+  }

@@ -29,11 +29,13 @@ void dispose(node* t);
 struct entry find( char* search, node *t );
 struct node* findNode(char* search, node *t);
 node* insert( struct entry movieEntry, node *t );
-node* delete( int data, node *t );
+node* delete(node* library, entry movieToDelete );
 void displayMatches(node* t, char* query);
 void displayTree(node* t);
+node* minItem(node* tree);
 void printTree(node* library);
-
+void printMovie(entry movie);
+void copyMovie(entry* dest, entry src);
 /*
 
     remove all nodes of an AVL tree
@@ -66,6 +68,7 @@ struct entry find(char* query, node* t )
   else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
     return find( query, t->right );
   else if( (strcmp(query, t->movieInfo.titleMod) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
+    /*    
     strcpy(movie.title, t->movieInfo.title);
     strcpy(movie.titleOrig, t->movieInfo.titleOrig);
     strcpy(movie.titleMod, t->movieInfo.titleMod);
@@ -74,6 +77,8 @@ struct entry find(char* query, node* t )
     strcpy(movie.mediaType, t->movieInfo.mediaType);
     strcpy(movie.runtimeMinutes, t->movieInfo.runtimeMinutes);
     strcpy(movie.genres, t->movieInfo.genres);
+    */
+    copyMovie(&movie, t->movieInfo);
     return movie;
   }else{
     displayMatches(t, query);
@@ -213,6 +218,7 @@ node* insert(struct entry movie/*int e*/, node* t)
 	}
       else
 	{
+	  /*
 	  strcpy(t->movieInfo.title, movie.title);
 	  strcpy(t->movieInfo.titleOrig, movie.titleOrig);
 	  strcpy(t->movieInfo.titleMod, movie.titleMod);
@@ -222,6 +228,8 @@ node* insert(struct entry movie/*int e*/, node* t)
 	  //USER INFO
 	  strcpy(t->movieInfo.acquireDate, movie.acquireDate);
 	  strcpy(t->movieInfo.mediaType, movie.mediaType);
+	  */
+	  copyMovie(&t->movieInfo, movie);
 	  t->height = 0;
 	  t->left = t->right = NULL;
 	}
@@ -253,14 +261,6 @@ node* insert(struct entry movie/*int e*/, node* t)
   return t;
 }
 
-/*
-    remove a node in the tree
-*/
-node* delete( int e, node* t )
-{
-  printf( "Sorry; Delete is unimplemented; %d remains\n", e );
-  return t;
-}
 
 void displayMatches(node* t, char *query)
 {
@@ -310,11 +310,81 @@ void printTree(node *library){
   if (library == NULL){
     return;
   }
+ 
+  //printf("%s(Orig: %s)\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.title, library->movieInfo.titleOrig, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
+  //library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
+
+  printMovie(library->movieInfo);
   
-
-  printf("%s(Orig: %s)\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.title, library->movieInfo.titleOrig, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
-         library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
-
     printTree(library->left);
     printTree(library->right);
+}
+
+void printMovie(entry movie){
+  printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
+  return;
+}
+
+
+
+node* delete(node *library, struct entry movieToDelete)
+{
+    if(library == NULL)
+        return library;
+    if(strcmp(movieToDelete.titleMod, library->movieInfo.titleMod) < 0)//delItem < tTree->key)
+        library->left = delete(library->left, movieToDelete);
+    else
+      if(strcmp(movieToDelete.titleMod, library->movieInfo.titleMod) > 0)//delItem > tTree->key)
+            library->right = delete(library->right, movieToDelete);
+      else{  
+	node *tmp = library;
+	if ((library->left) && (library->right))
+	  {
+	    node *parent = library->right;
+	    library = parent->left;
+	    if (library)
+	      {
+		while(library->left)
+		  {
+		    parent = library;
+		    library = library->left;
+		  }
+		parent->left = library->right;
+		library->right = tmp->right;
+	      }
+	    else
+	      library = parent;
+	    library->left = tmp->left;
+	  }
+	else
+	  if(library->left)
+	    library = library->left;
+	  else
+	    library = library->right;
+	free(tmp);
+      }
+    return library;   
+}
+
+
+
+node* minItem(node* tree){
+
+  if (tree->left)
+    tree = tree->left;
+  
+  return tree;
+}
+
+void copyMovie(struct entry *dest, struct entry src){
+  strcpy(dest->title, src.title);
+  strcpy(dest->titleOrig, src.titleOrig);
+  strcpy(dest->titleMod, src.titleMod);
+  strcpy(dest->releaseDate, src.releaseDate);
+  strcpy(dest->runtimeMinutes, src.runtimeMinutes);
+  strcpy(dest->genres, src.genres);
+  //USER INFO
+  strcpy(dest->acquireDate, src.acquireDate);
+  strcpy(dest->mediaType, src.mediaType);
+  return;
 }
