@@ -6,7 +6,7 @@
 node* createEntry(node*, node*);
 void readEntry(node*);
 node* updateEntry(node*);
-void deleteEntry(node*);
+node* deleteEntry(node*);
 node* loadDatabase(node*);
 node* loadUserLibrary(FILE*, node*);
 void saveLog(FILE*, node*);
@@ -193,9 +193,14 @@ struct node* updateEntry(node *library){
   return movieNode;
 }
 
-void deleteEntry(node *library){
+node* deleteEntry(node *library){
   printf("Deleting entry\n");
-  return;
+  printf("Search the name of the movie you would like to delete from your library: ");
+  //char nodeName[200];
+  //scanf("%[^\n]s", nodeName);
+  struct node* nodeToDelete = searchNode(library);
+  printf("The genres for the node to delete are: %s\n", nodeToDelete->movieInfo.genres);
+  return nodeToDelete;
 }
 
 void helpMsg(char state[]){
