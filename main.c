@@ -5,7 +5,7 @@
 
 node* createEntry(node*, node*);
 void retrieveEntry(node*);
-node* updateEntry(node*);
+void updateEntry(node*);
 node* deleteEntry(node*);
 node* loadDatabase(node*);
 node* loadUserLibrary(FILE*, node*);
@@ -24,7 +24,7 @@ int main(void){
     printf("There was an error loading the database.\n");
   char state[50];
   char userName[50];
-  printf("Welcome to your home theater library.\nPlease enter in your user name in the form [first_last]\n");
+  printf("Welcome to your home theater library.\n\nPlease enter in your user name in the form [first_last]\n");
   scanf("%s", userName);
   printf("\nHello there, %s\n", userName);
 
@@ -45,7 +45,7 @@ int main(void){
   }
  
  
-  char cmdMsg[] = "Please enter a command or 'e' to exit: \n\t'c' to create an entry in your library\n\t'r' to retrieve an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n\t'p' to print out all of the movies in your library\n";
+  char cmdMsg[] = "Please enter a command: \n\t'c' to create an entry in your library\n\t'r' to retrieve an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n\t'p' to print out all of the movies in your library\n\t'e' to exit\n";
 
   printf("%s", cmdMsg);
   scanf("%s", state);
@@ -61,13 +61,15 @@ int main(void){
       retrieveEntry(library);
       break;
     case 'u':
-      library = updateEntry(library);
+      updateEntry(library);
       break;
     case 'd':
       library = deleteEntry(library);
       break;
     case 'p':
+      printf("\n---PRINTING USER LIBRARY---\n\n");
       printTree(library);
+      printf("\n---FINISHED PRINTING USER LIBRARY---\n\n");
       break;
     default:
       helpMsg(state);
@@ -140,7 +142,7 @@ void retrieveEntry(node *library){
 }
 
 
-struct node* updateEntry(node *library){
+void updateEntry(node *library){
   printf("Updating entry\n");
   char newInfo[200];
   getchar();
@@ -150,6 +152,8 @@ struct node* updateEntry(node *library){
   while (strcmp(movieNode->movieInfo.title, temp.title) == 0){
     movieNode = searchNode(library);
   }
+  //copy
+  
   //printf("The found movie was %s\n", movieNode->movieInfo.title);
   int choice;
   printf("Please select the number of the object you would like to update:\n\t1) Title\n\t2) Release Date\n\t3) Acquire Date\n\t4) Media Type\n\t5) Genres\n\t6) Quit\n\nOption: ");
@@ -191,7 +195,7 @@ struct node* updateEntry(node *library){
       choice = 0;
     }
     getchar();
-  return movieNode;
+  return;
 }
 
 node* deleteEntry(node *library){
@@ -199,8 +203,10 @@ node* deleteEntry(node *library){
   printf("Search the name of the movie you would like to delete from your library: ");
   getchar();
   entry movieToDelete = search(library);
-  printf("The genres for the node to delete are: %s\n", movieToDelete.genres);
+  //printf("The genres for the node to delete are: %s\n", movieToDelete.genres);
   library = delete(library, movieToDelete);
+  printf("\n\"%s\" has been deleted from your library!\n\n", movieToDelete.title);
+
   return library;
 }
 
@@ -275,7 +281,7 @@ node* loadDatabase(node* tree){
       }
     tree = insert(movieEntry, tree);
   }
-  printf("The IMDB movie database was loaded!\n");
+  printf("The IMDB movie database was loaded!\n\n");
 
   fclose(db);
 
