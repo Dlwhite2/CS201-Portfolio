@@ -2,11 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-<<<<<<< HEAD
 
-=======
-//#include "avltree.h"
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 
 typedef struct entry{
   char titleOrig[200];
@@ -19,10 +15,7 @@ typedef struct entry{
   char runtimeMinutes[10];
 } entry;
 
-<<<<<<< HEAD
 
-=======
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 typedef struct node
 {
   struct entry movieInfo;
@@ -40,7 +33,6 @@ void displayMatches(node* t, char* query);
 void displayTree(node* t);
 
 /*
-<<<<<<< HEAD
 
     remove all nodes of an AVL tree
 
@@ -65,23 +57,6 @@ void dispose(node* t)
 }
 
 
-=======
-    remove all nodes of an AVL tree
-*/
-void dispose(node* t)
-{
-  if( t != NULL )
-    {
-      dispose( t->left );
-      dispose( t->right );
-      free( t );
-    }
-}
-
-/*
-    find a specific node's key in the tree
-v*/
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 
 struct entry find(char* query, node* t )
 {
@@ -91,11 +66,7 @@ struct entry find(char* query, node* t )
     return movie;
   }
 
-<<<<<<< HEAD
   //printf("Comparing --%s-- with --%s--\n", query, t->movieInfo.titleMod);
-=======
-  printf("Comparing --%s-- with --%s--\n", query, t->movieInfo.titleMod);
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
   
   if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
     return find( query, t->left );
@@ -150,16 +121,9 @@ static node* single_rotate_with_left( node* k2 )
   k1 = k2->left;
   k2->left = k1->right;
   k1->right = k2;
-<<<<<<< HEAD
   k2->height = max( height( k2->left ), height( k2->right ) ) + 1;
   k1->height = max( height( k1->left ), k2->height ) + 1;
     return k1; /* new root */
-=======
-
-  k2->height = max( height( k2->left ), height( k2->right ) ) + 1;
-  k1->height = max( height( k1->left ), k2->height ) + 1;
-  return k1; /* new root */
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 }
 
 /*
@@ -180,11 +144,7 @@ static node* single_rotate_with_right( node* k1 )
   k1->height = max( height( k1->left ), height( k1->right ) ) + 1;
   k2->height = max( height( k2->right ), k1->height ) + 1;
 
-<<<<<<< HEAD
   return k2;
-=======
-  return k2;  /* New root */
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 }
 
 /*
@@ -212,10 +172,6 @@ static node* double_rotate_with_left( node* k3 )
 */
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 static node* double_rotate_with_right( node* k1 )
 {
   /* rotate between K3 and k2 */
@@ -241,10 +197,6 @@ node* insert(struct entry movie/*int e*/, node* t)
 	}
       else
 	{
-<<<<<<< HEAD
-=======
-	  //t->title = e;
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 	  strcpy(t->movieInfo.title, movie.title);
 	  strcpy(t->movieInfo.titleOrig, movie.titleOrig);
 	  strcpy(t->movieInfo.titleMod, movie.titleMod);
@@ -252,10 +204,6 @@ node* insert(struct entry movie/*int e*/, node* t)
 	  strcpy(t->movieInfo.runtimeMinutes, movie.runtimeMinutes);
 	  strcpy(t->movieInfo.genres, movie.genres);
 	  //USER INFO
-<<<<<<< HEAD
-=======
-	  //printf("mediaType: %s\n", movie.mediaType);
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
 	  strcpy(t->movieInfo.acquireDate, movie.acquireDate);
 	  strcpy(t->movieInfo.mediaType, movie.mediaType);
 	  t->height = 0;
@@ -337,15 +285,6 @@ void displayTree(node* t){
     return;
   printf("%s",t->movieInfo.title);
 
-<<<<<<< HEAD
-=======
-  if(t->left != NULL)
-    printf("(L:%s)",t->left->movieInfo.title);
-  if(t->right != NULL)
-    printf("(R:%s)",t->right->movieInfo.title);
-  printf("\n");
-
->>>>>>> a5482e526189e8e4e0f5fcf36dc03b003dbd46c3
   displayTree(t->left);
   displayTree(t->right);
 }
