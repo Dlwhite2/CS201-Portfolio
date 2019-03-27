@@ -74,11 +74,17 @@ struct entry find(char* query, node* t )
     int counter = 1;
     int *cnt = &counter;
     entry matches[30];
+    printf("\n---SEARCH RESULTS---\n\n");
     displayMatches(matches, cnt, t, query);
+    printf("\n---FINISH SEARCH RESULTS---\n\n");
     printf("Please enter the number of the movie you'd like to add to your library: ");
     int choice;
     scanf("%d", &choice);
     getchar();
+    if (choice == 0){
+      printf("Please search the name of the movie you would like to add to your library: ");
+      return movie;
+    }
     return matches[choice - 1];
   }
 }
@@ -277,12 +283,12 @@ void displayMatches(entry *matches, int *count, node* t, char *query)
 
   if (strstr(t->movieInfo.titleMod, query) != NULL){
     if (strcmp(t->movieInfo.titleOrig, t->movieInfo.title) != 0)
-      printf("%d) %s (%s)\n", *count, t->movieInfo.title, t->movieInfo.titleOrig);
+      printf("%d) %s (%s)\t[%s]\n", *count, t->movieInfo.title, t->movieInfo.titleOrig, t->movieInfo.releaseDate);
     else
-      printf("%d) %s\n", *count, t->movieInfo.title);
+      printf("%d) %s\t[%s]\n", *count, t->movieInfo.title, t->movieInfo.releaseDate);
     matches[*count-1] = t->movieInfo;
     (*count)++;
-     if (*count == 51)
+     if (*count == 31)
        max = true;
   }
   
@@ -291,7 +297,7 @@ void displayMatches(entry *matches, int *count, node* t, char *query)
   displayMatches(matches, count, t->right, query);
 
   if (max == true){
-    printf("\n\nThere are more than 30 results! Please refine your search.\n\n");
+    printf("\n\nThere are more than 30 results! If you don't see the movie you want, enter '0' and please refine your search.\n\n");
     max = false;
   }
   
