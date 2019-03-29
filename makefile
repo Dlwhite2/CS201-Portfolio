@@ -1,10 +1,9 @@
-all:
-
+all:	main.c avltree.c userFunctions.c
 	#wget https://datasets.imdbws.com/title.basics.tsv.gz
 	#7z x title.basics.tsv.gz
 	#grep "movie" data.tsv > original_records.txt
 	#cut -s -f1,2,5,7 --complement original_records.txt >movie_records.txt
-	gcc -Wall main.c -o movieLibrary
+	gcc -Wall main.c avltree.c userFunctions.c -o movieLibrary
 	#make clean
 
 clean:

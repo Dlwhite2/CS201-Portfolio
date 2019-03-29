@@ -1,56 +1,12 @@
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-//#include <stdbool.h>
 
-#ifndef AVLTREE_H_
-#define AVLTREE_H_
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include "userFunctions.h"
+#include "avltree.h"
 
-#define MAX_TITLE_LENGTH 200
-#define MAX_INFO_LENGTH 50
-
-typedef struct entry{
-  char titleOrig[MAX_TITLE_LENGTH];
-  char title[MAX_TITLE_LENGTH];
-  char titleMod[MAX_TITLE_LENGTH];
-  char releaseDate[MAX_INFO_LENGTH];
-  char acquireDate[MAX_INFO_LENGTH];
-  char mediaType[MAX_INFO_LENGTH];
-  char genres[MAX_INFO_LENGTH];
-  char runtimeMinutes[10];
-} entry;
-
-
-typedef struct node
-{
-  struct entry movieInfo;
-  struct node*  left;
-  struct node*  right;
-  int height;
-} node;
-
-
-void dispose(node* t);
-entry find( char* search, node *t );
-node* findNode(char* search, node *t);
-node* insert( struct entry movieEntry, node *t );
-node* delete(node* library, entry movieToDelete );
-void displayMatches(entry *matches, int* counter, node* t, char* query);
-void displayTree(node* t);
-node* minItem(node* tree);
-void printTree(node* library);
-void printMovie(entry movie);
-void copyMovie(entry* dest, entry src);
-entry search(node*);
-node* searchNode(node*);
-
-/*
-
-    remove all nodes of an AVL tree
-
-*/
-/*
-void dispose(node* t)
+void dispose(struct node* t)
 {
   if( t != NULL )
     {
@@ -61,7 +17,7 @@ void dispose(node* t)
 }
 
 
-struct entry find(char* query, node* t )
+entry find(char* query, struct node* t )
 {
   struct entry movie = {0};
   if( t == NULL ){
@@ -79,7 +35,7 @@ struct entry find(char* query, node* t )
   }else{
     int counter = 1;
     int *cnt = &counter;
-    entry matches[30];
+    struct entry matches[30];
     printf("\n---SEARCH RESULTS---\n\n");
     displayMatches(matches, cnt, t, query);
     printf("\n---FINISH SEARCH RESULTS---\n\n");
@@ -99,7 +55,7 @@ struct entry find(char* query, node* t )
 }
 
 
-struct node* findNode(char* query, node* t )
+node* findNode(char* query, struct node* t )
 {
   struct node* temp = NULL;
   if( t == NULL ){
@@ -116,15 +72,17 @@ struct node* findNode(char* query, node* t )
   }else{
     int counter = 1;
     int *cnt = &counter;
-    entry matches[30];
+    struct entry matches[30];
     displayMatches(matches, cnt, t, query);
     return t;
   }
 }
 
 
-
-static int height( node* n )
+/*
+    get the height of a node
+*/
+static int height( struct node* n )
 {
   if( n == NULL )
     return -1;
@@ -132,13 +90,19 @@ static int height( node* n )
     return n->height;
 }
 
-
+/*
+    get maximum value of two integers
+*/
 static int max( int l, int r)
 {
   return l > r ? l: r;
 }
 
-
+/*
+    perform a rotation between a k2 node and its left child
+ 
+    note: call single_rotate_with_left only if k2 node has a left child
+*/
 
 static node* single_rotate_with_left( node* k2 )
 {
@@ -149,9 +113,15 @@ static node* single_rotate_with_left( node* k2 )
   k1->right = k2;
   k2->height = max( height( k2->left ), height( k2->right ) ) + 1;
   k1->height = max( height( k1->left ), k2->height ) + 1;
-    return k1; 
+    return k1; /* new root */
 }
 
+/*
+    perform a rotation between a node (k1) and its right child
+ 
+    note: call single_rotate_with_right only if
+    the k1 node has a right child
+*/
 
 static node* single_rotate_with_right( node* k1 )
 {
@@ -167,31 +137,48 @@ static node* single_rotate_with_right( node* k1 )
   return k2;
 }
 
+/*
+ 
+    perform the left-right double rotation,
+ 
+    note: call double_rotate_with_left only if k3 node has
+    a left child and k3's left child has a right child
+*/
 
 static node* double_rotate_with_left( node* k3 )
 {
-
+  /* Rotate between k1 and k2 */
   k3->left = single_rotate_with_right( k3->left );
 
-
+  /* Rotate between K3 and k2 */
   return single_rotate_with_left( k3 );
 }
+
+/*
+    perform the right-left double rotation
+ 
+   notes: call double_rotate_with_right only if k1 has a
+   right child and k1's right child has a left child
+*/
 
 
 static node* double_rotate_with_right( node* k1 )
 {
+  /* rotate between K3 and k2 */
   k1->right = single_rotate_with_left( k1->right );
 
-
+  /* rotate between k1 and k2 */
   return single_rotate_with_right( k1 );
 }
 
-
-node* insert(struct entry movie, node* t)
+/*
+    insert a new node into the tree
+*/
+node* insert(struct entry movie/*int e*/, node* t)
 {
   if( t == NULL )
     {
-      
+      /* Create and return a one-node tree */
       t = (node*)malloc(sizeof(node));
       if( t == NULL )
 	{
@@ -225,7 +212,7 @@ node* insert(struct entry movie, node* t)
 	  t = double_rotate_with_right( t );
       }
     }
-  
+  /* Else X is in the tree already; we'll do nothing */
 
   t->height = max( height( t->left ), height( t->right ) ) + 1;
   // printf("TitleOrig: %s \t TitleOrigMod: %s\n", t->movieInfo.titleOrig, t->movieInfo.titleOrigMod);
@@ -350,6 +337,48 @@ void copyMovie(struct entry *dest, struct entry src){
   strcpy(dest->acquireDate, src.acquireDate);
   strcpy(dest->mediaType, src.mediaType);
   return;
-}*/
+}
 
-#endif
+
+struct entry search(node *tree){
+  char search[150];
+  //getchar();
+  struct entry movieSearch = {0};
+  scanf("%[^\n]s", search);
+  if (strcmp(search, "!") == 0)
+    return movieSearch;
+  getchar();
+  strlwr(search);
+  removeArticles(search);
+  movieSearch = find(search, tree);
+  while (strcmp(movieSearch.title, "") == 0 && strcmp(search, "!") != 0){
+    scanf("%[^\n]s", search);
+    getchar();
+    strlwr(search);
+    removeArticles(search);
+    movieSearch = find(search, tree);
+  }
+  return movieSearch;
+}
+
+struct node* searchNode(node *library){
+
+  char search[150];
+  struct node* t = {0};
+  scanf("%[^\n]s", search);
+  if (strcmp(search, "!") == 0)
+    return t;
+  getchar();
+  strlwr(search);
+  removeArticles(search);
+  t = findNode(search, library);
+  while(t == NULL && strcmp(search, "!")){
+    scanf("%[^\n]s", search);
+    getchar();
+    strlwr(search);
+    removeArticles(search);
+    t = findNode(search, library);
+  }
+    
+  return t;
+}

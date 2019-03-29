@@ -2,19 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "avltree.h"
+#include "userFunctions.h"
 
-node* createEntry(node*, node*);
-void retrieveEntry(node*);
-void updateEntry(node*);
-node* deleteEntry(node*);
+//node2* createEntry(node*, node*);
+//void retrieveEntry(node*);
+//void updateEntry(node*);
+//node* deleteEntry(node*);
 node* createTree(FILE*, node*);
 void saveLog(FILE*, node*);
 void helpMsg(char*);
 int commandFormatIsCorrect(char*);
-void removeArticles(char*);
-entry search(node*);
-node* searchNode(node*);
-void printMovie(entry);
+
+
 
 int main(void){
   node *tree = NULL;
@@ -100,7 +99,7 @@ int commandFormatIsCorrect(char state[]){
     return 0;
   }
 }
-
+/*
 node* createEntry(node *tree, node *library){
   getchar();
   printf("Creating entry\n");
@@ -214,7 +213,7 @@ node* deleteEntry(node *library){
 
   return library;
 }
-
+*/
 void helpMsg(char state[]){
   printf("Sorry, %s is not a valid command. Please try one of the commands above.\n", state);
   return;
@@ -232,49 +231,6 @@ void saveLog(FILE *log, node *library){
 
     saveLog(log, library->left);
     saveLog(log, library->right);
-}
-
-struct entry search(node *tree){
-  char search[150];
-  //getchar();
-  struct entry movieSearch = {0};
-  scanf("%[^\n]s", search);
-  if (strcmp(search, "!") == 0)
-    return movieSearch;
-  getchar();
-  strlwr(search);
-  removeArticles(search);
-  movieSearch = find(search, tree);
-  while (strcmp(movieSearch.title, "") == 0 && strcmp(search, "!") != 0){
-    scanf("%[^\n]s", search);
-    getchar();
-    strlwr(search);
-    removeArticles(search);
-    movieSearch = find(search, tree);
-  }
-  return movieSearch;
-}
-
-struct node* searchNode(node *library){
-
-  char search[150];
-  struct node* t = {0};
-  scanf("%[^\n]s", search);
-  if (strcmp(search, "!") == 0)
-    return t;
-  getchar();
-  strlwr(search);
-  removeArticles(search);
-  t = findNode(search, library);
-  while(t == NULL && strcmp(search, "!")){
-    scanf("%[^\n]s", search);
-    getchar();
-    strlwr(search);
-    removeArticles(search);
-    t = findNode(search, library);
-  }
-    
-  return t;
 }
 
 
@@ -334,20 +290,3 @@ node* createTree(FILE *log, node *library){
   return library;
 }
 
-void removeArticles (char *string) {
-  char *match;
-  char *articles[] = {"the ", "a ", "an ", ", ", ": ", "; ", ". ", "'"};
-  int i;
-  for (i = 0; i < 8; i++){
-    int len = strlen(articles[i]);
-    while ((match = strstr(string, articles[i]))) {
-      *match = '\0';
-      strcat(string, match+len);
-    }
-  }
-}
-
-void printNode(entry movie){
-    printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
-    return;
-  }
