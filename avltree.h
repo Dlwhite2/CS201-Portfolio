@@ -3,15 +3,17 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define MAX_TITLE_LENGTH 200
+#define MAX_INFO_LENGTH 50
 
 typedef struct entry{
-  char titleOrig[200];
-  char title[200];
-  char titleMod[200];
-  char releaseDate[15];
-  char acquireDate[15];
-  char mediaType[15];
-  char genres[50];
+  char titleOrig[MAX_TITLE_LENGTH];
+  char title[MAX_TITLE_LENGTH];
+  char titleMod[MAX_TITLE_LENGTH];
+  char releaseDate[MAX_INFO_LENGTH];
+  char acquireDate[MAX_INFO_LENGTH];
+  char mediaType[MAX_INFO_LENGTH];
+  char genres[MAX_INFO_LENGTH];
   char runtimeMinutes[10];
 } entry;
 
@@ -60,8 +62,6 @@ struct entry find(char* query, node* t )
     printf("Could not find any matches. Please edit or refine your search.\n");
     return movie;
   }
-
-  //printf("Comparing --%s-- with --%s--\n", query, t->movieInfo.titleMod);
   
   if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
     return find( query, t->left );
@@ -82,7 +82,10 @@ struct entry find(char* query, node* t )
     scanf("%d", &choice);
     getchar();
     if (choice == 0){
-      printf("Please search the name of the movie you would like to add to your library: ");
+      printf("\nPlease search the name of the movie you would like to add to your library: ");
+      return movie;
+    } else if (choice > 30){
+      printf("Sorry, that was not a valid option. Exiting command.\n\n");
       return movie;
     }
     return matches[choice - 1];
@@ -97,12 +100,10 @@ struct node* findNode(char* query, node* t )
     printf("Could not find any matches\n");
     return temp;
   }
-
-  //printf("Comparing --%s-- with --%s--\n", query, t->movieInfo.titleMod);
   
-  if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
+  if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)
     return findNode( query, t->left );
-  else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
+  else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)
     return findNode( query, t->right );
   else if( (strcmp(query, t->movieInfo.titleMod) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
     return t;
@@ -224,17 +225,6 @@ node* insert(struct entry movie/*int e*/, node* t)
 	}
       else
 	{
-	  /*
-	  strcpy(t->movieInfo.title, movie.title);
-	  strcpy(t->movieInfo.titleOrig, movie.titleOrig);
-	  strcpy(t->movieInfo.titleMod, movie.titleMod);
-	  strcpy(t->movieInfo.releaseDate, movie.releaseDate);
-	  strcpy(t->movieInfo.runtimeMinutes, movie.runtimeMinutes);
-	  strcpy(t->movieInfo.genres, movie.genres);
-	  //USER INFO
-	  strcpy(t->movieInfo.acquireDate, movie.acquireDate);
-	  strcpy(t->movieInfo.mediaType, movie.mediaType);
-	  */
 	  copyMovie(&t->movieInfo, movie);
 	  t->height = 0;
 	  t->left = t->right = NULL;
@@ -270,11 +260,8 @@ node* insert(struct entry movie/*int e*/, node* t)
 
 void displayMatches(entry *matches, int *count, node* t, char *query)
 {
-  //static int count = 1;
   static bool max = false;
-  //printf("Query is: %s\n", query);
   if (*count == 31){
-    //printf("\n\nThere are more than 50 search results! Please refine your search.\n\n");
     return;
   }
   
@@ -292,12 +279,11 @@ void displayMatches(entry *matches, int *count, node* t, char *query)
        max = true;
   }
   
-  // printf("Stop print\n");
   displayMatches(matches, count, t->left, query);
   displayMatches(matches, count, t->right, query);
 
   if (max == true){
-    printf("\n\nThere are more than 30 results! If you don't see the movie you want, enter '0' and please refine your search.\n\n");
+    printf("\n\nThere are more than 30 results! If you don't see the movie you want, enter '0' and then please refine your search.\n\n");
     max = false;
   }
   
@@ -318,13 +304,9 @@ void printTree(node *library){
     return;
   }
  
-  //printf("%s(Orig: %s)\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.title, library->movieInfo.titleOrig, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
-  //library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
-
   printMovie(library->movieInfo);
-  
-    printTree(library->left);
-    printTree(library->right);
+  printTree(library->left);
+  printTree(library->right);
 }
 
 void printMovie(entry movie){
@@ -333,15 +315,14 @@ void printMovie(entry movie){
 }
 
 
-
 node* delete(node *library, struct entry movieToDelete)
 {
     if(library == NULL)
         return library;
-    if(strcmp(movieToDelete.titleMod, library->movieInfo.titleMod) < 0)//delItem < tTree->key)
+    if(strcmp(movieToDelete.titleMod, library->movieInfo.titleMod) < 0)
         library->left = delete(library->left, movieToDelete);
     else
-      if(strcmp(movieToDelete.titleMod, library->movieInfo.titleMod) > 0)//delItem > tTree->key)
+      if(strcmp(movieToDelete.titleMod, library->movieInfo.titleMod) > 0)
             library->right = delete(library->right, movieToDelete);
       else{  
 	node *tmp = library;

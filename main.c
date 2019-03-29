@@ -7,8 +7,7 @@ node* createEntry(node*, node*);
 void retrieveEntry(node*);
 void updateEntry(node*);
 node* deleteEntry(node*);
-node* loadDatabase(node*);
-node* loadUserLibrary(FILE*, node*);
+node* createTree(FILE*, node*);
 void saveLog(FILE*, node*);
 void helpMsg(char*);
 int commandFormatIsCorrect(char*);
@@ -19,7 +18,10 @@ void printMovie(entry);
 
 int main(void){
   node *tree = NULL;
-  tree = loadDatabase(tree);
+  FILE * db;
+  db = fopen("movie_records.txt", "r");
+
+  tree = createTree(db, tree);
   if (tree == NULL)
     printf("There was an error loading the database.\n");
   char state[50];
@@ -35,13 +37,10 @@ int main(void){
   FILE * log;
   log = fopen(userName, "r");
   if (log){
-    library = loadUserLibrary(log, library);
+    library = createTree(log, library);
     if (library == NULL)
       printf("The library was empty!\n");
     fclose(log);
-    //log = fopen(userName, "w");
-  } else {
-    //log = fopen(userName, "w");
   }
  
  
@@ -90,6 +89,9 @@ int main(void){
   return 0;
 }
 
+
+
+
 int commandFormatIsCorrect(char state[]){
   if (state[1] == '\0'){
     return 1;
@@ -119,8 +121,6 @@ node* createEntry(node *tree, node *library){
   printf("\nWhat type of media is the movie?\n\tOptions:\n\t\t\"DVD\"\n\t\t\"BR\" for BluRay\n\t\t\"VCR\"\n\t\t\"DC\" for Digital Copy\nMedia Type: ");
   scanf("%[^\n]s", mediaType);
   getchar();
-
-  printf("mediaType is: %s\n", mediaType);
   
   strcpy(movie.acquireDate, acquireDate);
   strcpy(movie.mediaType, mediaType);
@@ -156,13 +156,6 @@ void updateEntry(node *library){
     return;
   }
   getchar();
-  //struct entry temp = {0};
-  // while (strcmp(movieNode->movieInfo.title, temp.title) == 0){
-  //movieNode = searchNode(library);
-  //}
-  //copy
-  
-  //printf("The found movie was %s\n", movieNode->movieInfo.title);
   int choice;
   printf("Please select the number of the object you would like to update:\n\t1) Title\n\t2) Release Date\n\t3) Acquire Date\n\t4) Media Type\n\t5) Genres\n\t6) Quit\n\nOption: ");
   scanf("%d", &choice);
@@ -234,77 +227,12 @@ void saveLog(FILE *log, node *library){
     return;
   }
 
- fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
-	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
-
- //printf("Just Printed: %s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.acquireDate,
- //	 library->movieInfo.runtimeMinutes, library->movieInfo.mediaType, library->movieInfo.genres);
+ fprintf(log, "%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n", library->movieInfo.titleOrig, library->movieInfo.title, library->movieInfo.releaseDate, library->movieInfo.runtimeMinutes,
+	 library->movieInfo.genres, library->movieInfo.acquireDate, library->movieInfo.mediaType);
 
     saveLog(log, library->left);
     saveLog(log, library->right);
 }
-
-
-node* loadDatabase(node* tree){
-  printf("Loading IMDB's movie database...\n");
-  FILE * db;
-  char line[200];
-  db = fopen("movie_records.txt", "r");
-
-  while (fgets(line, sizeof(line), db) != NULL) {
-    char * data;
-    struct entry movieEntry;
-    int counter = 0;
-    data = strtok (line,"\t");
-    while (data != NULL)
-      {
-	switch(counter){
-	case 0:
-	  break;
-	case 1:
-	  break;
-	case 2:
-	  strcpy(movieEntry.titleOrig, data);
-	  break;
-	case 3:
-	  strcpy(movieEntry.title, data);
-	  strlwr(data);
-	  removeArticles(data);
-          strcpy(movieEntry.titleMod, data);
-	  break;
-	case 4:
-	  break;
-	case 5:
-	  strcpy(movieEntry.releaseDate, data);
-	  break;
-	case 6:
-	  break;
-	case 7:
-	  strcpy(movieEntry.runtimeMinutes, data);
-	  break;
-	case 8:
-	  strcpy(movieEntry.genres, data);
-	  break;
-	default:
-	  break;
-	}
-	counter++;
-	data = strtok (NULL, "\t");
-      }
-    strcat(movieEntry.titleMod, " [");
-    strcat(movieEntry.titleMod, movieEntry.releaseDate);
-    strcat(movieEntry.titleMod, "]");
-    
-    tree = insert(movieEntry, tree);
-  }
-  printf("The IMDB movie database was loaded!\n\n");
-
-  fclose(db);
-
-  return tree;
-
-}
-
 
 struct entry search(node *tree){
   char search[150];
@@ -318,9 +246,6 @@ struct entry search(node *tree){
   removeArticles(search);
   movieSearch = find(search, tree);
   while (strcmp(movieSearch.title, "") == 0 && strcmp(search, "!") != 0){
-    //if (strcmp(search, "!") == 0)
-      //return movieSearch;
-    printf("Got inside here\n");
     scanf("%[^\n]s", search);
     getchar();
     strlwr(search);
@@ -342,7 +267,6 @@ struct node* searchNode(node *library){
   removeArticles(search);
   t = findNode(search, library);
   while(t == NULL && strcmp(search, "!")){
-    printf("Got inside here\n");
     scanf("%[^\n]s", search);
     getchar();
     strlwr(search);
@@ -354,17 +278,18 @@ struct node* searchNode(node *library){
 }
 
 
-node* loadUserLibrary(FILE *log, node *library){
+node* createTree(FILE *log, node *library){
   printf("\nLoading your movie library...\n");
   char line[200];  
   while(fgets(line, sizeof(line), log) != NULL){
     char * data;
     struct entry movieEntry;
     int counter = 0;
+    char *pos;
     data = strtok (line,"\t"); 
     while (data != NULL)
       {
-	//printf("data = %s\n", data);
+	//printf("data = %s s\n", data);
 	switch(counter){
 	case 0:
 	  strcpy(movieEntry.titleOrig, data);
@@ -382,16 +307,18 @@ node* loadUserLibrary(FILE *log, node *library){
 	  strcat(movieEntry.titleMod, "]");
 	  break;
 	case 3:
-	  strcpy(movieEntry.acquireDate, data);
-	  break;
-	case 4:
 	  strcpy(movieEntry.runtimeMinutes, data);
 	  break;
+	case 4:
+	  if ((pos=strchr(data, '\n')) != NULL)
+	    *pos = '\0';
+	  strcpy(movieEntry.genres, data);
+	  break;
 	case 5:
-	  strcpy(movieEntry.mediaType, data);
+	  strcpy(movieEntry.acquireDate, data);
 	  break;
 	case 6:
-	  strcpy(movieEntry.genres, data);
+	  strcpy(movieEntry.mediaType, data);
 	  break;
 	default:
 	  break;
