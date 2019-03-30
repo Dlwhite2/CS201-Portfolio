@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "userFunctions.h"
 #include "avltree.h"
 
 void dispose(struct node* t)
@@ -21,32 +20,29 @@ entry find(char* query, struct node* t )
 {
   struct entry movie = {0};
   if( t == NULL ){
-    printf("Could not find any matches. Please edit or refine your search.\n");
+    printf("Could not find any matches. Please edit or refine your search: ");
     return movie;
   }
   
-  if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)//e < t->data )
+  if( strncmp(query, t->movieInfo.titleMod, strlen(query)) < 0)
     return find( query, t->left );
-  else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)//e > t->data )
+  else if( strncmp(query, t->movieInfo.titleMod, strlen(query)) > 0)
     return find( query, t->right );
-  else if( (strcmp(query, t->movieInfo.titleMod) == 0  && (strlen(query) == strlen(t->movieInfo.titleMod)))){
-    copyMovie(&movie, t->movieInfo);
-    return movie;
-  }else{
+  else{
     int counter = 1;
     int *cnt = &counter;
     struct entry matches[30];
     printf("\n---SEARCH RESULTS---\n\n");
     displayMatches(matches, cnt, t, query);
     printf("\n---FINISH SEARCH RESULTS---\n\n");
-    printf("Please enter the number of the movie you'd like to add to your library: ");
+    printf("Please enter the number of the movie you'd like to add to your library (or '0' to search again): ");
     int choice;
     scanf("%d", &choice);
     getchar();
     if (choice == 0){
-      printf("\nPlease search the name of the movie you would like to add to your library: ");
+      printf("\nPlease search the name of the movie you would like to add to your library (or '!' to quit): ");
       return movie;
-    } else if (choice > 30){
+    }else if (choice < 0 || choice > counter){
       printf("Sorry, that was not a valid option. Exiting command.\n\n");
       return movie;
     }
@@ -57,7 +53,9 @@ entry find(char* query, struct node* t )
 
 node* findNode(char* query, struct node* t )
 {
-  struct node* temp = NULL;
+
+  //struct node* temp = NULL;
+  struct node* temp = {0};
   if( t == NULL ){
     printf("Could not find any matches\n");
     return temp;
@@ -72,10 +70,40 @@ node* findNode(char* query, struct node* t )
   }else{
     int counter = 1;
     int *cnt = &counter;
+    //struct entry *movie = {0};
     struct entry matches[30];
+    printf("\n---SEARCH RESULTS---\n\n");
     displayMatches(matches, cnt, t, query);
+    printf("\n---FINISH SEARCH RESULTS---\n\n");
+    printf("Please enter the number of the movie you'd like to add to your library (or '0' to search again): ");
+    int choice;
+    scanf("%d", &choice);
+    getchar();
+    if (choice == 0){
+      printf("\nPlease search the name of the movie you would like to add to your library (or '!' to quit): ");
+      return NULL;
+    } else if (choice > 30){
+      printf("Sorry, that was not a valid option. Exiting command.\n\n");
+      return NULL;
+    }
+    return returnExactNode(t, matches[choice - 1]);
+  }
+}
+
+node* returnExactNode(struct node* t, struct entry exactMovie){
+  if( t == NULL ){
+    printf("Could not find any matches. Please edit or refine your search: \n");
     return t;
   }
+  
+  if( strncmp(exactMovie.titleMod, t->movieInfo.titleMod, strlen(exactMovie.titleMod)) < 0)//e < t->data )
+    return returnExactNode( t->left, exactMovie );
+  else if( strncmp(exactMovie.titleMod, t->movieInfo.titleMod, strlen(exactMovie.titleMod)) > 0)//e > t->data )
+    return returnExactNode( t->right, exactMovie );
+  else if( (strcmp(exactMovie.titleMod, t->movieInfo.titleMod) == 0  && (strlen(exactMovie.titleMod) == strlen(t->movieInfo.titleMod)))){
+    return t;
+  } 
+  return t;
 }
 
 
@@ -171,9 +199,8 @@ static node* double_rotate_with_right( node* k1 )
   return single_rotate_with_right( k1 );
 }
 
-/*
-    insert a new node into the tree
-*/
+
+//Insert a new node into the tree
 node* insert(struct entry movie/*int e*/, node* t)
 {
   if( t == NULL )
@@ -215,7 +242,6 @@ node* insert(struct entry movie/*int e*/, node* t)
   /* Else X is in the tree already; we'll do nothing */
 
   t->height = max( height( t->left ), height( t->right ) ) + 1;
-  // printf("TitleOrig: %s \t TitleOrigMod: %s\n", t->movieInfo.titleOrig, t->movieInfo.titleOrigMod);
   return t;
 }
 
@@ -272,7 +298,7 @@ void printTree(node *library){
 }
 
 void printMovie(entry movie){
-  printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate);
+  printf("\nTitle: %s\n\tRelease Date: %s\n\tRuntime (m): %s\n\tMedia Type: %s\n\tDate Acquired: %s\n\tGenres: %s\n\n", movie.title, movie.releaseDate, movie.runtimeMinutes, movie.mediaType, movie.acquireDate, movie.genres);
   return;
 }
 
@@ -327,58 +353,15 @@ node* minItem(node* tree){
 }
 
 void copyMovie(struct entry *dest, struct entry src){
-  strcpy(dest->title, src.title);
-  strcpy(dest->titleOrig, src.titleOrig);
-  strcpy(dest->titleMod, src.titleMod);
-  strcpy(dest->releaseDate, src.releaseDate);
-  strcpy(dest->runtimeMinutes, src.runtimeMinutes);
-  strcpy(dest->genres, src.genres);
+  strncpy(dest->title, src.title, sizeof(dest->title));
+  strncpy(dest->titleOrig, src.titleOrig, sizeof(dest->titleOrig));
+  strncpy(dest->titleMod, src.titleMod, sizeof(dest->titleMod));
+  strncpy(dest->releaseDate, src.releaseDate, sizeof(dest->releaseDate));
+  strncpy(dest->runtimeMinutes, src.runtimeMinutes, sizeof(dest->runtimeMinutes));
+  strncpy(dest->genres, src.genres, sizeof(dest->genres));
   //USER INFO
-  strcpy(dest->acquireDate, src.acquireDate);
-  strcpy(dest->mediaType, src.mediaType);
+  strncpy(dest->acquireDate, src.acquireDate, sizeof(dest->acquireDate));
+  strncpy(dest->mediaType, src.mediaType, sizeof(dest->mediaType));
   return;
 }
 
-
-struct entry search(node *tree){
-  char search[150];
-  //getchar();
-  struct entry movieSearch = {0};
-  scanf("%[^\n]s", search);
-  if (strcmp(search, "!") == 0)
-    return movieSearch;
-  getchar();
-  strlwr(search);
-  removeArticles(search);
-  movieSearch = find(search, tree);
-  while (strcmp(movieSearch.title, "") == 0 && strcmp(search, "!") != 0){
-    scanf("%[^\n]s", search);
-    getchar();
-    strlwr(search);
-    removeArticles(search);
-    movieSearch = find(search, tree);
-  }
-  return movieSearch;
-}
-
-struct node* searchNode(node *library){
-
-  char search[150];
-  struct node* t = {0};
-  scanf("%[^\n]s", search);
-  if (strcmp(search, "!") == 0)
-    return t;
-  getchar();
-  strlwr(search);
-  removeArticles(search);
-  t = findNode(search, library);
-  while(t == NULL && strcmp(search, "!")){
-    scanf("%[^\n]s", search);
-    getchar();
-    strlwr(search);
-    removeArticles(search);
-    t = findNode(search, library);
-  }
-    
-  return t;
-}
