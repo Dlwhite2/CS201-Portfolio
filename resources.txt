@@ -1,2 +1,5 @@
+Code used for the the majority of the AVL tree functions:
 http://www.zentut.com/c-tutorial/c-avl-tree/
+
+Code used for deleting a node from the AVL tree:
 https://stackoverflow.com/questions/35297364/avl-tree-delete-item-in-c
