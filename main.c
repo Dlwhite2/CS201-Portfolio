@@ -99,13 +99,19 @@ int main(void){
     }
   }
 
-  
+  //Display exit message
   printf("Your log is being saved in %s in the directory where this program is installed.\n", userName);
 
   //Once the user decides to exit, save their library into [userName].txt 
   log = fopen(userName, "w");
   saveLog(log, library);
+
+  //Close the log before exiting
   fclose(log);
+
+  //Clear the AVL trees from memory
+  dispose(library);
+  dispose(tree);
   
   return 0;
 }

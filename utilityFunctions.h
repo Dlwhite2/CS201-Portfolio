@@ -1,6 +1,7 @@
 #ifndef UTILITYFUNCTIONS_H_
 #define UTILITYFUNCTIONS_H_
 
+//This header file defines all of the miscellaneous functions that aren't CRUD-related or AVL tree-related
 
 node* createTree(FILE*, node*);
 void saveLog(FILE*, node*);

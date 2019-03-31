@@ -1,9 +1,11 @@
---------------------------------------------
+-----------------------------------------------------------------------------------
 Personal IMDB Movie Library README
 Author: Daniel White
 Class: CS201- Data Structures and Algorithms
 Date: 03/31/2019
---------------------------------------------
+-----------------------------------------------------------------------------------
+
+
 
 -----------------------------------------------------------------------------------
 Summary:
@@ -43,6 +45,7 @@ installed and can be run using the command, "./movieLibrary.exe".
 -----------------------------------------------------------------------------------
 
 
+
 -----------------------------------------------------------------------------------
 User Instructions:
 -----------------------------------------------------------------------------------
@@ -75,5 +78,5 @@ abort the search. If you perform the search, a numbered list (30 max) of matches
 (both full and partial) will be displayed. Then you can select a movie from the list
 by entering the number that is displayed next to the movie you'd like. This is how
 the search works across all of the searching functions. If there are more than 30
-search results, you may enter a '0' to try to search again.
+search results, you may enter a '0' to quit the command and try to search again.
 -----------------------------------------------------------------------------------

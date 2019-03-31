@@ -1,8 +1,9 @@
-
 #ifndef AVLTREE_H_
 #define AVLTREE_H_
 
 #define MAX_INFO_LENGTH 200
+
+//This header file defines all of the functions associated with the AVL tree
 
 typedef struct entry{
   char titleOrig[MAX_INFO_LENGTH];
@@ -16,8 +17,7 @@ typedef struct entry{
 } entry;
 
 
-typedef struct node
-{
+typedef struct node {
   struct entry movieInfo;
   struct node*  left;
   struct node*  right;
@@ -32,7 +32,6 @@ node* returnExactNode(node* t, entry movie);
 node* insert( struct entry movieEntry, node *t );
 node* delete(node* library, entry movieToDelete );
 void displayMatches(entry *matches, int* counter, node* t, char* query);
-void displayTree(node* t);
 node* minItem(node* tree);
 void printTree(node* library);
 void printMovie(entry movie);
