@@ -29,10 +29,10 @@ contains all of the files needed to run the program. However, installation of th
 program may require installation of a some extra command prompt libraries:
 
    Prerequisites:
-     1) make- Can be installed using the command "sudo apt-get install make"
-     2) wget- Should already be installed on both Ubuntu and Windows (Cygwin)
-     3) 7z-   Can be installed using the command "sudo apt-get install p7zip-full"
-     4) grep- Should already be installed on both Ubuntu and Windows (Cygwin)
+     1 - make-> Can be installed using the command "sudo apt-get install make"
+     2 - wget-> Should already be installed on both Ubuntu and Windows (Cygwin)
+     3 - 7z->   Can be installed using the command "sudo apt-get install p7zip-full"
+     4 - grep-> Should already be installed on both Ubuntu and Windows (Cygwin)
 
 After ensuring that all of the prerequisites are installed, run the command "make".
 Running "make" will download the database from IMDB and extract it. Then, it will
