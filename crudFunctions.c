@@ -54,7 +54,7 @@ node* createEntry(node *tree, node *library){
 //This function retrieves and displays the information for a movie in the user's library
 void retrieveEntry(node *library){
   //Let the user know what's happening
-  printf("Reading entry\n");
+  printf("Retrieving entry\n");
   printf("Search the name of the movie in your movie library that you would like to know about (or '!' to quit): ");
 
   //Find the movie in the user's library

@@ -23,7 +23,7 @@ int main(void){
 
   //Get username
   char userName[50];
-  scanf("%46s", userName);
+  scanf("%46[^\n]s", userName);
   flush();
   printf("\nHello there, %s\n", userName);
 
