@@ -22,8 +22,8 @@ int main(void){
   printf("Welcome to your home theater library.\n\nPlease enter in a user name: ");
 
   //Get username
-  char userName[50];
-  scanf("%46[^\n]s", userName);
+  char userName[MAX_INFO_LENGTH];
+  scanf("%200[^\n]s", userName);
   flush();
   printf("\nHello there, %s\n", userName);
 
@@ -45,14 +45,14 @@ int main(void){
   char cmdMsg[] = "Please enter a command: \n\t'c' to create an entry in your library\n\t'r' to retrieve an entry in your library\n\t'u' to update an entry in your library\n\t'd' to delete an entry in your library\n\t'p' to print out all of the movies in your library\n\t'e' to exit\n";
 
   //Get the command from the user
-  char state[50];
+  char state[MAX_INFO_LENGTH];
   printf("%s", cmdMsg);
-  scanf("%50s", state);
+  scanf("%200s", state);
   flush();
 
   //Verify the correct command formatting
   while (!commandFormatIsCorrect(state)){
-    scanf("%50s", state);
+    scanf("%200s", state);
     flush();
   }
 
@@ -94,7 +94,7 @@ int main(void){
 
     //Again, verify that it's format is correct
     while (!commandFormatIsCorrect(state)){
-      scanf("%50s", state);
+      scanf("%200s", state);
       flush();
     }
   }

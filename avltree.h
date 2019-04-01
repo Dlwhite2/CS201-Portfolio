@@ -13,7 +13,7 @@ typedef struct entry{
   char acquireDate[MAX_INFO_LENGTH];
   char mediaType[MAX_INFO_LENGTH];
   char genres[MAX_INFO_LENGTH];
-  char runtimeMinutes[10];
+  char runtimeMinutes[MAX_INFO_LENGTH];
 } entry;
 
 

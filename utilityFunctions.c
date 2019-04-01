@@ -9,8 +9,8 @@
 struct entry search(node *tree){
 
   //Get the search query
-  char search[150];
-  scanf("%150[^\n]s", search);
+  char search[MAX_INFO_LENGTH];
+  scanf("%200[^\n]s", search);
   flush();
 
   //Check to make sure the user didn't quit before proceding
@@ -32,9 +32,9 @@ struct entry search(node *tree){
 struct node* searchNode(node *library){
 
   //Get search query
-  char search[150];
+  char search[MAX_INFO_LENGTH];
   struct node* t = {0};
-  scanf("%150[^\n]s", search);
+  scanf("%200[^\n]s", search);
   flush();
 
   //Check to make sure the user didn't quit before proceding
@@ -122,7 +122,7 @@ node* createTree(FILE *log, node *library){
   printf("\nLoading your movie library...\n");
 
   //Load a single line into memory
-  char line[200];  
+  char line[MAX_INFO_LENGTH];  
   while(fgets(line, sizeof(line), log) != NULL){
     
     //Use this object to hold all of the information to be inserted in the AVL tree
@@ -186,7 +186,8 @@ node* createTree(FILE *log, node *library){
   }
 
   //Let the user know that the data was loaded
-  printf("Your movie library was loaded!\n\n");
+  printf("Your movie library was loaded!\n");
+  printf("**Limit input to 200 characters**\n\n");
   return library;
 }
 

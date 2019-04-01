@@ -29,7 +29,7 @@ node* createEntry(node *tree, node *library){
   //Get the date the movie was acquired
   char acquireDate[50];
   printf("When did you buy the movie? MM/YYYY = ");
-  scanf("%50[^\n]s", acquireDate);
+  scanf("%200[^\n]s", acquireDate);
   flush();
   strncpy(movie.acquireDate, acquireDate, sizeof(movie.acquireDate));
 
@@ -37,7 +37,7 @@ node* createEntry(node *tree, node *library){
   char mediaType[50];
   printf("Acquire date is: %s\n", acquireDate);
   printf("\nWhat type of media is the movie?\n\tOptions:\n\t\t\"DVD\"\n\t\t\"BR\" for BluRay\n\t\t\"VCR\"\n\t\t\"DC\" for Digital Copy\nMedia Type: ");
-  scanf("%50[^\n]s", mediaType);
+  scanf("%200[^\n]s", mediaType);
   flush();
   strncpy(movie.mediaType, mediaType, sizeof(movie.mediaType));
 
@@ -123,7 +123,7 @@ void updateEntry(node *library){
     break;
   case 4://Update the Media Type
     printf("Please enter the new Media Type: ");
-    scanf("%[^\n]s", newInfo);
+    scanf("%200[^\n]s", newInfo);
     flush();
     strncpy(movieNode->movieInfo.mediaType, newInfo, sizeof(movieNode->movieInfo.mediaType));
     break;
