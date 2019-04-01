@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 Personal IMDB Movie Library README
 Author: Daniel White
-Class: CS201- Data Structures and Algorithms
+Class: CS201 - Data Structures and Algorithms
 Date: 03/31/2019
 GitHub: https://github.com/Dlwhite2/CS201-Portfolio.git
 Youtube: https://www.youtube.com/watch?v=F0RrsTLF8No&t=9s
