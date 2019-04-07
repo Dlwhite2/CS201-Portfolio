@@ -105,7 +105,7 @@ void updateEntry(node *library){
     flush();
     strncpy(movieNode->movieInfo.title, newInfo, sizeof(movieNode->movieInfo.title));
     //Also update the modified title
-    strlwr(newInfo);
+    toLower(newInfo);
     removeArticles(newInfo);
     strncpy(movieNode->movieInfo.titleMod, newInfo, sizeof(movieNode->movieInfo.titleMod));
     break;

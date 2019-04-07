@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "avltree.h"
 #include "utilityFunctions.h"
 
@@ -19,7 +20,7 @@ struct entry search(node *tree){
     return movieSearch;
 
   //Modify the search query to match the modified titles in the avl tree
-  strlwr(search);
+  toLower(search);
   removeArticles(search);
 
   //Return the movie entry from the AVL tree
@@ -42,7 +43,7 @@ struct node* searchNode(node *library){
     return t;
 
   //Modify the search query to match the modified titles in the avl tree
-  strlwr(search);
+  toLower(search);
   removeArticles(search);
 
   //Return the node from the AVL tree
@@ -148,7 +149,7 @@ node* createTree(FILE *log, node *library){
 	case 1://Primary title -> title. Modify title -> titleMod
 	  strcpy(movieEntry.title, data);
 	  //Save lowercase/article-less copy -> titleMod
-	  strlwr(data);
+	  toLower(data);
 	  removeArticles(data);
 	  strcpy(movieEntry.titleMod, data);
 	  break;
@@ -197,6 +198,17 @@ void flush(){
   int c;
   //Loop through the rest of stdin and discard whatever we find
   while ((c = getchar()) != '\n' && c != EOF);
+  
+  return;
+}
+
+void toLower(char* word){
+
+  int i;
+  
+  for (i = 0; i < strlen(word); i++){
+    word[i] = tolower(word[i]);
+  }
   
   return;
 }

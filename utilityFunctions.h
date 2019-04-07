@@ -12,5 +12,6 @@ void printMovie(entry);
 entry search(node*);
 node* searchNode(node*);
 void flush();
+void toLower(char*);
 
 #endif
